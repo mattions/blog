@@ -1,4 +1,9 @@
 {
+
+  "require": {
+    "php": "~5.6.0"
+  }
+
     "scripts": {
         "post-install-cmd": [
             "chmod -R 777 wp-content"
