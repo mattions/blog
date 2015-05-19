@@ -7,7 +7,7 @@
 
     "scripts": {
         "post-install-cmd": [
-            "chmod -R 777 app/wp-content"
+            "chmod -R 777 wp-content"
         ]
     }
 }
