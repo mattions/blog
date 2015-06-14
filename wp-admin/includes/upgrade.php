@@ -118,6 +118,10 @@ if ( !function_exists('wp_install_defaults') ) :
  *
  * @since 2.1.0
  *
+ * @global wpdb       $wpdb
+ * @global WP_Rewrite $wp_rewrite
+ * @global string     $table_prefix
+ *
  * @param int $user_id User ID.
  */
 function wp_install_defaults( $user_id ) {
@@ -161,22 +165,22 @@ function wp_install_defaults( $user_id ) {
 	}
 
 	$wpdb->insert( $wpdb->posts, array(
-								'post_author' => $user_id,
-								'post_date' => $now,
-								'post_date_gmt' => $now_gmt,
-								'post_content' => $first_post,
-								'post_excerpt' => '',
-								'post_title' => __('Hello world!'),
-								/* translators: Default post slug */
-								'post_name' => sanitize_title( _x('hello-world', 'Default post slug') ),
-								'post_modified' => $now,
-								'post_modified_gmt' => $now_gmt,
-								'guid' => $first_post_guid,
-								'comment_count' => 1,
-								'to_ping' => '',
-								'pinged' => '',
-								'post_content_filtered' => ''
-								));
+		'post_author' => $user_id,
+		'post_date' => $now,
+		'post_date_gmt' => $now_gmt,
+		'post_content' => $first_post,
+		'post_excerpt' => '',
+		'post_title' => __('Hello world!'),
+		/* translators: Default post slug */
+		'post_name' => sanitize_title( _x('hello-world', 'Default post slug') ),
+		'post_modified' => $now,
+		'post_modified_gmt' => $now_gmt,
+		'guid' => $first_post_guid,
+		'comment_count' => 1,
+		'to_ping' => '',
+		'pinged' => '',
+		'post_content_filtered' => ''
+	));
 	$wpdb->insert( $wpdb->term_relationships, array('term_taxonomy_id' => $cat_tt_id, 'object_id' => 1) );
 
 	// Default comment
@@ -190,14 +194,14 @@ To delete a comment, just log in and view the post&#039;s comments. There you wi
 		$first_comment = get_site_option( 'first_comment', $first_comment );
 	}
 	$wpdb->insert( $wpdb->comments, array(
-								'comment_post_ID' => 1,
-								'comment_author' => $first_comment_author,
-								'comment_author_email' => '',
-								'comment_author_url' => $first_comment_url,
-								'comment_date' => $now,
-								'comment_date_gmt' => $now_gmt,
-								'comment_content' => $first_comment
-								));
+		'comment_post_ID' => 1,
+		'comment_author' => $first_comment_author,
+		'comment_author_email' => '',
+		'comment_author_url' => $first_comment_url,
+		'comment_date' => $now,
+		'comment_date_gmt' => $now_gmt,
+		'comment_content' => $first_comment
+	));
 
 	// First Page
 	$first_page = sprintf( __( "This is an example page. It's different from a blog post because it will stay in one place and will show up in your site navigation (in most themes). Most people start with an About page that introduces them to potential site visitors. It might say something like this:
@@ -213,22 +217,22 @@ As a new WordPress user, you should go to <a href=\"%s\">your dashboard</a> to d
 		$first_page = get_site_option( 'first_page', $first_page );
 	$first_post_guid = get_option('home') . '/?page_id=2';
 	$wpdb->insert( $wpdb->posts, array(
-								'post_author' => $user_id,
-								'post_date' => $now,
-								'post_date_gmt' => $now_gmt,
-								'post_content' => $first_page,
-								'post_excerpt' => '',
-								'post_title' => __( 'Sample Page' ),
-								/* translators: Default page slug */
-								'post_name' => __( 'sample-page' ),
-								'post_modified' => $now,
-								'post_modified_gmt' => $now_gmt,
-								'guid' => $first_post_guid,
-								'post_type' => 'page',
-								'to_ping' => '',
-								'pinged' => '',
-								'post_content_filtered' => ''
-								));
+		'post_author' => $user_id,
+		'post_date' => $now,
+		'post_date_gmt' => $now_gmt,
+		'post_content' => $first_page,
+		'post_excerpt' => '',
+		'post_title' => __( 'Sample Page' ),
+		/* translators: Default page slug */
+		'post_name' => __( 'sample-page' ),
+		'post_modified' => $now,
+		'post_modified_gmt' => $now_gmt,
+		'guid' => $first_post_guid,
+		'post_type' => 'page',
+		'to_ping' => '',
+		'pinged' => '',
+		'post_content_filtered' => ''
+	));
 	$wpdb->insert( $wpdb->postmeta, array( 'post_id' => 2, 'meta_key' => '_wp_page_template', 'meta_value' => 'default' ) );
 
 	// Set up default widgets for default theme.
@@ -385,7 +389,9 @@ if ( !function_exists('wp_upgrade') ) :
  *
  * @since 2.1.0
  *
- * @return null If no update is necessary or site isn't completely installed, null.
+ * @global int  $wp_current_db_version
+ * @global int  $wp_db_version
+ * @global wpdb $wpdb
  */
 function wp_upgrade() {
 	global $wp_current_db_version, $wp_db_version, $wpdb;
@@ -435,7 +441,8 @@ endif;
  *
  * @since 1.0.1
  *
- * @return null If no update is necessary, null.
+ * @global int $wp_current_db_version
+ * @global int $wp_db_version
  */
 function upgrade_all() {
 	global $wp_current_db_version, $wp_db_version;
@@ -545,6 +552,8 @@ function upgrade_all() {
  * Execute changes made in WordPress 1.0.
  *
  * @since 1.0.0
+ *
+ * @global wpdb $wpdb
  */
 function upgrade_100() {
 	global $wpdb;
@@ -601,6 +610,8 @@ function upgrade_100() {
  * Execute changes made in WordPress 1.0.1.
  *
  * @since 1.0.1
+ *
+ * @global wpdb $wpdb
  */
 function upgrade_101() {
 	global $wpdb;
@@ -619,6 +630,8 @@ function upgrade_101() {
  * Execute changes made in WordPress 1.2.
  *
  * @since 1.2.0
+ *
+ * @global wpdb $wpdb
  */
 function upgrade_110() {
 	global $wpdb;
@@ -679,6 +692,8 @@ function upgrade_110() {
  * Execute changes made in WordPress 1.5.
  *
  * @since 1.5.0
+ *
+ * @global wpdb $wpdb
  */
 function upgrade_130() {
 	global $wpdb;
@@ -763,6 +778,9 @@ function upgrade_130() {
  * Execute changes made in WordPress 2.0.
  *
  * @since 2.0.0
+ *
+ * @global wpdb $wpdb
+ * @global int  $wp_current_db_version
  */
 function upgrade_160() {
 	global $wpdb, $wp_current_db_version;
@@ -846,6 +864,9 @@ function upgrade_160() {
  * Execute changes made in WordPress 2.1.
  *
  * @since 2.1.0
+ *
+ * @global wpdb $wpdb
+ * @global int  $wp_current_db_version
  */
 function upgrade_210() {
 	global $wpdb, $wp_current_db_version;
@@ -890,6 +911,9 @@ function upgrade_210() {
  * Execute changes made in WordPress 2.3.
  *
  * @since 2.3.0
+ *
+ * @global wpdb $wpdb
+ * @global int  $wp_current_db_version
  */
 function upgrade_230() {
 	global $wp_current_db_version, $wpdb;
@@ -1066,6 +1090,8 @@ function upgrade_230() {
  * Remove old options from the database.
  *
  * @since 2.3.0
+ *
+ * @global wpdb $wpdb
  */
 function upgrade_230_options_table() {
 	global $wpdb;
@@ -1080,6 +1106,8 @@ function upgrade_230_options_table() {
  * Remove old categories, link2cat, and post2cat database tables.
  *
  * @since 2.3.0
+ *
+ * @global wpdb $wpdb
  */
 function upgrade_230_old_tables() {
 	global $wpdb;
@@ -1092,6 +1120,8 @@ function upgrade_230_old_tables() {
  * Upgrade old slugs made in version 2.2.
  *
  * @since 2.2.0
+ *
+ * @global wpdb $wpdb
  */
 function upgrade_old_slugs() {
 	// Upgrade people who were using the Redirect Old Slugs plugin.
@@ -1103,6 +1133,8 @@ function upgrade_old_slugs() {
  * Execute changes made in WordPress 2.5.0.
  *
  * @since 2.5.0
+ *
+ * @global int $wp_current_db_version
  */
 function upgrade_250() {
 	global $wp_current_db_version;
@@ -1117,6 +1149,8 @@ function upgrade_250() {
  * Execute changes made in WordPress 2.5.2.
  *
  * @since 2.5.2
+ *
+ * @global wpdb $wpdb
  */
 function upgrade_252() {
 	global $wpdb;
@@ -1128,6 +1162,8 @@ function upgrade_252() {
  * Execute changes made in WordPress 2.6.
  *
  * @since 2.6.0
+ *
+ * @global int $wp_current_db_version
  */
 function upgrade_260() {
 	global $wp_current_db_version;
@@ -1140,6 +1176,9 @@ function upgrade_260() {
  * Execute changes made in WordPress 2.7.
  *
  * @since 2.7.0
+ *
+ * @global wpdb $wpdb
+ * @global int  $wp_current_db_version
  */
 function upgrade_270() {
 	global $wpdb, $wp_current_db_version;
@@ -1156,6 +1195,9 @@ function upgrade_270() {
  * Execute changes made in WordPress 2.8.
  *
  * @since 2.8.0
+ *
+ * @global int  $wp_current_db_version
+ * @global wpdb $wpdb
  */
 function upgrade_280() {
 	global $wp_current_db_version, $wpdb;
@@ -1183,6 +1225,8 @@ function upgrade_280() {
  * Execute changes made in WordPress 2.9.
  *
  * @since 2.9.0
+ *
+ * @global int $wp_current_db_version
  */
 function upgrade_290() {
 	global $wp_current_db_version;
@@ -1200,6 +1244,9 @@ function upgrade_290() {
  * Execute changes made in WordPress 3.0.
  *
  * @since 3.0.0
+ *
+ * @global int  $wp_current_db_version
+ * @global wpdb $wpdb
  */
 function upgrade_300() {
 	global $wp_current_db_version, $wpdb;
@@ -1242,6 +1289,11 @@ function upgrade_300() {
  * Execute changes made in WordPress 3.3.
  *
  * @since 3.3.0
+ *
+ * @global int   $wp_current_db_version
+ * @global wpdb  $wpdb
+ * @global array $wp_registered_widgets
+ * @global array $sidebars_widgets
  */
 function upgrade_330() {
 	global $wp_current_db_version, $wpdb, $wp_registered_widgets, $sidebars_widgets;
@@ -1311,6 +1363,9 @@ function upgrade_330() {
  * Execute changes made in WordPress 3.4.
  *
  * @since 3.4.0
+ *
+ * @global int   $wp_current_db_version
+ * @global wpdb  $wpdb
  */
 function upgrade_340() {
 	global $wp_current_db_version, $wpdb;
@@ -1344,6 +1399,9 @@ function upgrade_340() {
  * Execute changes made in WordPress 3.5.
  *
  * @since 3.5.0
+ *
+ * @global int   $wp_current_db_version
+ * @global wpdb  $wpdb
  */
 function upgrade_350() {
 	global $wp_current_db_version, $wpdb;
@@ -1371,6 +1429,8 @@ function upgrade_350() {
  * Execute changes made in WordPress 3.7.
  *
  * @since 3.7.0
+ *
+ * @global int $wp_current_db_version
  */
 function upgrade_370() {
 	global $wp_current_db_version;
@@ -1383,6 +1443,8 @@ function upgrade_370() {
  *
  * @since 3.7.2
  * @since 3.8.0
+ *
+ * @global int $wp_current_db_version
  */
 function upgrade_372() {
 	global $wp_current_db_version;
@@ -1394,6 +1456,8 @@ function upgrade_372() {
  * Execute changes made in WordPress 3.8.0.
  *
  * @since 3.8.0
+ *
+ * @global int $wp_current_db_version
  */
 function upgrade_380() {
 	global $wp_current_db_version;
@@ -1406,6 +1470,8 @@ function upgrade_380() {
  * Execute changes made in WordPress 4.0.0.
  *
  * @since 4.0.0
+ *
+ * @global int $wp_current_db_version
  */
 function upgrade_400() {
 	global $wp_current_db_version;
@@ -1424,6 +1490,9 @@ function upgrade_400() {
  * Execute changes made in WordPress 4.2.0.
  *
  * @since 4.2.0
+ *
+ * @global int   $wp_current_db_version
+ * @global wpdb  $wpdb
  */
 function upgrade_420() {
 	global $wp_current_db_version, $wpdb;
@@ -1445,6 +1514,9 @@ function upgrade_420() {
  * Execute changes made in WordPress 4.3.0.
  *
  * @since 4.3.0
+ *
+ * @global int   $wp_current_db_version
+ * @global wpdb  $wpdb
  */
 function upgrade_430() {
 	global $wp_current_db_version, $wpdb;
@@ -1493,6 +1565,9 @@ function upgrade_430() {
  * Executes network-level upgrade routines.
  *
  * @since 3.0.0
+ *
+ * @global int   $wp_current_db_version
+ * @global wpdb  $wpdb
  */
 function upgrade_network() {
 	global $wp_current_db_version, $wpdb;
@@ -1634,6 +1709,8 @@ function upgrade_network() {
  *
  * @since 1.0.0
  *
+ * @global wpdb  $wpdb
+ *
  * @param string $table_name Database table name to create.
  * @param string $create_ddl SQL statement to create table.
  * @return bool If table already exists or was created by function.
@@ -1662,9 +1739,11 @@ function maybe_create_table($table_name, $create_ddl) {
  *
  * @since 1.0.1
  *
+ * @global wpdb  $wpdb
+ *
  * @param string $table Database table name.
  * @param string $index Index name to drop.
- * @return bool True, when finished.
+ * @return true True, when finished.
  */
 function drop_index($table, $index) {
 	global $wpdb;
@@ -1683,9 +1762,11 @@ function drop_index($table, $index) {
  *
  * @since 1.0.1
  *
+ * @global wpdb  $wpdb
+ *
  * @param string $table Database table name.
  * @param string $index Database table index column.
- * @return bool True, when done with execution.
+ * @return true True, when done with execution.
  */
 function add_clean_index($table, $index) {
 	global $wpdb;
@@ -1699,10 +1780,12 @@ function add_clean_index($table, $index) {
  *
  * @since 1.3.0
  *
+ * @global wpdb  $wpdb
+ *
  * @param string $table_name  The table name to modify.
  * @param string $column_name The column name to add to the table.
  * @param string $create_ddl  The SQL statement used to add the column.
- * @return True if already exists or on successful completion, false on error.
+ * @return bool True if already exists or on successful completion, false on error.
  */
 function maybe_add_column($table_name, $column_name, $create_ddl) {
 	global $wpdb;
@@ -1728,6 +1811,8 @@ function maybe_add_column($table_name, $column_name, $create_ddl) {
  * If a table only contains utf8 or utf8mb4 columns, convert it to utf8mb4.
  *
  * @since 4.2.0
+ *
+ * @global wpdb  $wpdb
  *
  * @param string $table The table to convert.
  * @return bool true if the table was converted, false if it wasn't.
@@ -1770,6 +1855,8 @@ function maybe_convert_table_to_utf8mb4( $table ) {
  *
  * @since 1.2.0
  *
+ * @global wpdb  $wpdb
+ *
  * @return stdClass List of options.
  */
 function get_alloptions_110() {
@@ -1791,6 +1878,8 @@ function get_alloptions_110() {
  * @ignore
  * @since 1.5.1
  * @access private
+ *
+ * @global wpdb  $wpdb
  *
  * @param string $setting Option name.
  * @return mixed
@@ -1850,6 +1939,8 @@ function deslash($content) {
  * Useful for creating new tables and updating existing tables to a new structure.
  *
  * @since 1.5.0
+ *
+ * @global wpdb  $wpdb
  *
  * @param string|array $queries Optional. The query to run. Can be multiple queries
  *                              in an array, or a string of queries separated by
@@ -2183,7 +2274,7 @@ function make_site_theme_from_oldschool($theme_name, $template) {
 
 				// Don't copy anything.
 				continue;
-				}
+			}
 		}
 
 		if (! @copy("$oldpath/$oldfile", "$site_dir/$newfile"))
@@ -2236,7 +2327,7 @@ function make_site_theme_from_oldschool($theme_name, $template) {
  *
  * @param string $theme_name The name of the theme.
  * @param string $template   The directory name of the theme.
- * @return null|false
+ * @return false|void
  */
 function make_site_theme_from_default($theme_name, $template) {
 	$site_dir = WP_CONTENT_DIR . "/themes/$template";
@@ -2375,6 +2466,8 @@ function translate_level_to_role($level) {
  * Checks the version of the installed MySQL binary.
  *
  * @since 2.1.0
+ *
+ * @global wpdb  $wpdb
  */
 function wp_check_mysql_version() {
 	global $wpdb;
@@ -2404,6 +2497,9 @@ function maybe_disable_automattic_widgets() {
  * Disables the Link Manager on upgrade if, at the time of upgrade, no links exist in the DB.
  *
  * @since 3.5.0
+ *
+ * @global int  $wp_current_db_version
+ * @global wpdb $wpdb
  */
 function maybe_disable_link_manager() {
 	global $wp_current_db_version, $wpdb;
@@ -2416,6 +2512,9 @@ function maybe_disable_link_manager() {
  * Runs before the schema is upgraded.
  *
  * @since 2.9.0
+ *
+ * @global int  $wp_current_db_version
+ * @global wpdb $wpdb
  */
 function pre_schema_upgrade() {
 	global $wp_current_db_version, $wpdb;
@@ -2472,6 +2571,8 @@ function pre_schema_upgrade() {
  *
  * @since 3.0.0
  *
+ * @global wpdb   $wpdb
+ * @global string $charset_collate
  */
 if ( !function_exists( 'install_global_terms' ) ) :
 function install_global_terms() {

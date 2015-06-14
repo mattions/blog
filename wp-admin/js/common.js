@@ -37,17 +37,19 @@ columns = {
 	},
 
 	checked : function(column) {
-		$('.column-' + column).show();
+		$('.column-' + column).removeClass( 'hidden' );
 		this.colSpanChange(+1);
 	},
 
 	unchecked : function(column) {
-		$('.column-' + column).hide();
+		$('.column-' + column).addClass( 'hidden' );
 		this.colSpanChange(-1);
 	},
 
 	hidden : function() {
-		return $('.manage-column').filter(':hidden').map(function() { return this.id; }).get().join(',');
+		return $( '.manage-column[id]' ).filter( ':hidden' ).map(function() {
+			return this.id;
+		}).get().join( ',' );
 	},
 
 	useCheckboxesForHidden : function() {
@@ -478,7 +480,7 @@ $(document).ready( function() {
 				focusedRowActions.removeClass( 'visible' );
 			}, 30 );
 		}
-	}, 'td.post-title, td.title, td.comment, .tags td.column-name, .bookmarks td.column-name, td.blogname, .users-network td.column-blogs, td.username, .dashboard-comment-wrap' );
+	}, 'td.has-row-actions' );
 
 	$('#default-password-nag-no').click( function() {
 		setUserSetting('default_password_nag', 'hide');

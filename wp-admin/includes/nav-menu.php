@@ -40,6 +40,8 @@ class Walker_Nav_Menu_Edit extends Walker_Nav_Menu {
 	 * @see Walker_Nav_Menu::start_el()
 	 * @since 3.0.0
 	 *
+	 * @global int $_wp_nav_menu_max_depth
+	 *
 	 * @param string $output Passed by reference. Used to append additional content.
 	 * @param object $item   Menu item data object.
 	 * @param int    $depth  Depth of menu item. Used for padding.
@@ -145,13 +147,13 @@ class Walker_Nav_Menu_Edit extends Walker_Nav_Menu {
 						</label>
 					</p>
 				<?php endif; ?>
-				<p class="description description-thin">
+				<p class="description description-wide">
 					<label for="edit-menu-item-title-<?php echo $item_id; ?>">
 						<?php _e( 'Navigation Label' ); ?><br />
 						<input type="text" id="edit-menu-item-title-<?php echo $item_id; ?>" class="widefat edit-menu-item-title" name="menu-item-title[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->title ); ?>" />
 					</label>
 				</p>
-				<p class="description description-thin">
+				<p class="field-title-attribute description description-wide">
 					<label for="edit-menu-item-attr-title-<?php echo $item_id; ?>">
 						<?php _e( 'Title Attribute' ); ?><br />
 						<input type="text" id="edit-menu-item-attr-title-<?php echo $item_id; ?>" class="widefat edit-menu-item-attr-title" name="menu-item-attr-title[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->post_excerpt ); ?>" />
@@ -235,6 +237,10 @@ class Walker_Nav_Menu_Edit extends Walker_Nav_Menu {
  * @uses Walker_Nav_Menu
  */
 class Walker_Nav_Menu_Checklist extends Walker_Nav_Menu {
+	/**
+	 *
+	 * @param array $fields
+	 */
 	public function __construct( $fields = false ) {
 		if ( $fields ) {
 			$this->db_fields = $fields;
@@ -279,6 +285,8 @@ class Walker_Nav_Menu_Checklist extends Walker_Nav_Menu {
 	 * @see Walker_Nav_Menu::start_el()
 	 *
 	 * @since 3.0.0
+	 *
+	 * @global int $_nav_menu_placeholder
 	 *
 	 * @param string $output Passed by reference. Used to append additional content.
 	 * @param object $item   Menu item data object.
@@ -454,7 +462,7 @@ function wp_nav_menu_setup() {
 	if( false === get_user_option( 'managenav-menuscolumnshidden' ) ) {
 		$user = wp_get_current_user();
 		update_user_option($user->ID, 'managenav-menuscolumnshidden',
-			array( 0 => 'link-target', 1 => 'css-classes', 2 => 'xfn', 3 => 'description', ),
+			array( 0 => 'link-target', 1 => 'css-classes', 2 => 'xfn', 3 => 'description', 4 => 'title-attribute', ),
 			true);
 	}
 }
@@ -463,6 +471,8 @@ function wp_nav_menu_setup() {
  * Limit the amount of meta boxes to just links, pages and cats for first time users.
  *
  * @since 3.0.0
+ *
+ * @global array $wp_meta_boxes
  **/
 function wp_initial_nav_menu_meta_boxes() {
 	global $wp_meta_boxes;
@@ -549,7 +559,7 @@ function wp_nav_menu_taxonomy_meta_boxes() {
  *
  * @since 3.6.0
  *
- * @uses global $one_theme_location_no_menus to determine if no menus exist
+ * @global bool $one_theme_location_no_menus to determine if no menus exist
  *
  * @param int|string $nav_menu_selected_id (id, name or slug) of the currently-selected menu
  * @return string Disabled attribute if at least one menu exists, false if not
@@ -567,6 +577,9 @@ function wp_nav_menu_disabled_check( $nav_menu_selected_id ) {
  * Displays a metabox for the custom links menu item.
  *
  * @since 3.0.0
+ *
+ * @global int        $_nav_menu_placeholder
+ * @global int|string $nav_menu_selected_id
  */
 function wp_nav_menu_item_link_meta_box() {
 	global $_nav_menu_placeholder, $nav_menu_selected_id;
@@ -605,6 +618,9 @@ function wp_nav_menu_item_link_meta_box() {
  * Displays a metabox for a post type menu item.
  *
  * @since 3.0.0
+ *
+ * @global int        $_nav_menu_placeholder
+ * @global int|string $nav_menu_selected_id
  *
  * @param string $object Not used.
  * @param string $post_type The post type object.
@@ -848,6 +864,8 @@ function wp_nav_menu_item_post_type_meta_box( $object, $post_type ) {
  * Displays a metabox for a taxonomy menu item.
  *
  * @since 3.0.0
+ *
+ * @global int|string $nav_menu_selected_id
  *
  * @param string $object Not used.
  * @param string $taxonomy The taxonomy object.
@@ -1215,6 +1233,7 @@ function wp_nav_menu_manage_columns() {
 	return array(
 		'_title' => __('Show advanced menu properties'),
 		'cb' => '<input type="checkbox" />',
+		'title-attribute' => __('Title Attribute'),
 		'link-target' => __('Link Target'),
 		'css-classes' => __('CSS Classes'),
 		'xfn' => __('Link Relationship (XFN)'),
@@ -1228,6 +1247,7 @@ function wp_nav_menu_manage_columns() {
  * @access private
  * @since 3.0.0
  *
+ * @global wpdb $wpdb
  */
 function _wp_delete_orphaned_draft_menu_items() {
 	global $wpdb;
@@ -1239,7 +1259,6 @@ function _wp_delete_orphaned_draft_menu_items() {
 	foreach( (array) $menu_items_to_delete as $menu_item_id )
 		wp_delete_post( $menu_item_id, true );
 }
-add_action('admin_head-nav-menus.php', '_wp_delete_orphaned_draft_menu_items');
 
 /**
  * Saves nav menu items
@@ -1280,10 +1299,11 @@ function wp_nav_menu_update_menu_items ( $nav_menu_selected_id, $nav_menu_select
 
 			$menu_item_db_id = wp_update_nav_menu_item( $nav_menu_selected_id, ( $_POST['menu-item-db-id'][$_key] != $_key ? 0 : $_key ), $args );
 
-			if ( is_wp_error( $menu_item_db_id ) )
+			if ( is_wp_error( $menu_item_db_id ) ) {
 				$messages[] = '<div id="message" class="error"><p>' . $menu_item_db_id->get_error_message() . '</p></div>';
-			elseif ( isset( $menu_items[$menu_item_db_id] ) )
-				unset( $menu_items[$menu_item_db_id] );
+			} else {
+				unset( $menu_items[ $menu_item_db_id ] );
+			}
 		}
 	}
 
