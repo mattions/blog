@@ -176,7 +176,7 @@ class Custom_Background {
 	public function admin_page() {
 ?>
 <div class="wrap" id="custom-background">
-<h2><?php _e( 'Custom Background' ); ?></h2>
+<h1><?php _e( 'Custom Background' ); ?></h1>
 
 <?php if ( current_user_can( 'customize' ) ) { ?>
 <div class="notice notice-info hide-if-no-customize">
@@ -259,6 +259,7 @@ class Custom_Background {
 </tr>
 <?php endif; ?>
 
+<?php if ( current_user_can( 'upload_files' ) ): ?>
 <tr>
 <th scope="row"><?php _e('Select Image'); ?></th>
 <td><form enctype="multipart/form-data" id="upload-form" class="wp-upload-form" method="post">
@@ -278,6 +279,7 @@ class Custom_Background {
 	</form>
 </td>
 </tr>
+<?php endif; ?>
 </tbody>
 </table>
 

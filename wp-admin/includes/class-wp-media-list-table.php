@@ -280,7 +280,7 @@ class WP_Media_List_Table extends WP_List_Table {
 		if ( !$this->detached ) {
 			$posts_columns['parent'] = _x( 'Uploaded to', 'column name' );
 			if ( post_type_supports( 'attachment', 'comments' ) )
-				$posts_columns['comments'] = '<span class="vers"><span title="' . esc_attr__( 'Comments' ) . '" class="comment-grey-bubble"></span></span>';
+				$posts_columns['comments'] = '<span class="vers comment-grey-bubble" title="' . esc_attr__( 'Comments' ) . '"><span class="screen-reader-text">' . __( 'Comments' ) . '</span></span>';
 		}
 		/* translators: column name */
 		$posts_columns['date'] = _x( 'Date', 'column name' );
@@ -509,7 +509,7 @@ class WP_Media_List_Table extends WP_List_Table {
 				/* translators: used between list items, there is a space after the comma */
 				echo join( __( ', ' ), $out );
 			} else {
-				echo '<span aria-hidden="true">&#8212;</span><span class="screen-reader-text">' . get_taxonomy( $taxonomy )->labels->not_found . '</span>';
+				echo '<span aria-hidden="true">&#8212;</span><span class="screen-reader-text">' . get_taxonomy( $taxonomy )->labels->no_terms . '</span>';
 			}
 
 			return;
@@ -619,5 +619,23 @@ class WP_Media_List_Table extends WP_List_Table {
 		 *                          to any posts. Default true.
 		 */
 		return apply_filters( 'media_row_actions', $actions, $post, $this->detached );
+	}
+
+	/**
+	 * Generate and display row actions links.
+	 *
+	 * @since 4.3.0
+	 * @access protected
+	 *
+	 * @param object $post        Attachment being acted upon.
+	 * @param string $column_name Current column name.
+	 * @param string $primary     Primary column name.
+	 * @return string Row actions output for media attachments.
+	 */
+	protected function handle_row_actions( $post, $column_name, $primary ) {
+		if ( $primary === $column_name ) {
+			$att_title = _draft_or_post_title();
+			return $this->row_actions( $this->_get_row_actions( $post, $att_title ) );
+		}
 	}
 }

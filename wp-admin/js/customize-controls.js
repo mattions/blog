@@ -524,9 +524,7 @@
 		 * @since 4.1.0
 		 */
 		attachEvents: function () {
-			var section = this,
-				backBtn = section.container.find( '.customize-section-back' ),
-				sectionTitle = section.container.find( '.accordion-section-title' ).first();
+			var section = this;
 
 			// Expand/Collapse accordion sections on click.
 			section.container.find( '.accordion-section-title, .customize-section-back' ).on( 'click keydown', function( event ) {
@@ -537,14 +535,8 @@
 
 				if ( section.expanded() ) {
 					section.collapse();
-					backBtn.attr( 'tabindex', '-1' );
-					sectionTitle.attr( 'tabindex', '0' );
-					sectionTitle.focus();
 				} else {
 					section.expand();
-					sectionTitle.attr( 'tabindex', '-1' );
-					backBtn.attr( 'tabindex', '0' );
-					backBtn.focus();
 				}
 			});
 		},
@@ -592,6 +584,8 @@
 				container = section.container.closest( '.wp-full-overlay-sidebar-content' ),
 				content = section.container.find( '.accordion-section-content' ),
 				overlay = section.container.closest( '.wp-full-overlay' ),
+				backBtn = section.container.find( '.customize-section-back' ),
+				sectionTitle = section.container.find( '.accordion-section-title' ).first(),
 				expand;
 
 			if ( expanded && ! section.container.hasClass( 'open' ) ) {
@@ -606,6 +600,10 @@
 						position = content.offset().top;
 						scroll = container.scrollTop();
 						content.css( 'margin-top', ( 45 - position - scroll ) );
+						content.css( 'height', ( window.innerHeight - 90 ) );
+						sectionTitle.attr( 'tabindex', '-1' );
+						backBtn.attr( 'tabindex', '0' );
+						backBtn.focus();
 						if ( args.completeCallback ) {
 							args.completeCallback();
 						}
@@ -634,7 +632,9 @@
 				overlay.removeClass( 'section-open' );
 				content.css( 'margin-top', 'inherit' );
 				container.scrollTop( 0 );
-				section.container.find( '.accordion-section-title' ).focus();
+				backBtn.attr( 'tabindex', '-1' );
+				sectionTitle.attr( 'tabindex', '0' );
+				sectionTitle.focus();
 				if ( args.completeCallback ) {
 					args.completeCallback();
 				}
@@ -3207,6 +3207,27 @@
 
 			control.setting.bind( function( to ) {
 				control.element.set( 'blank' !== to );
+			});
+		});
+
+		// Change previewed URL to the homepage when changing the page_on_front.
+		api( 'show_on_front', 'page_on_front', function( showOnFront, pageOnFront ) {
+			var updatePreviewUrl = function() {
+				if ( showOnFront() === 'page' && parseInt( pageOnFront(), 10 ) > 0 ) {
+					api.previewer.previewUrl.set( api.settings.url.home );
+				}
+			};
+			showOnFront.bind( updatePreviewUrl );
+			pageOnFront.bind( updatePreviewUrl );
+		});
+
+		// Change the previewed URL to the selected page when changing the page_for_posts.
+		api( 'page_for_posts', function( setting ) {
+			setting.bind(function( pageId ) {
+				pageId = parseInt( pageId, 10 );
+				if ( pageId > 0 ) {
+					api.previewer.previewUrl.set( api.settings.url.home + '?page_id=' + pageId );
+				}
 			});
 		});
 

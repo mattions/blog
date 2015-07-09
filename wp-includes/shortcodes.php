@@ -88,9 +88,7 @@ $shortcode_tags = array();
  */
 function add_shortcode($tag, $func) {
 	global $shortcode_tags;
-
-	if ( is_callable($func) )
-		$shortcode_tags[$tag] = $func;
+	$shortcode_tags[ $tag ] = $func;
 }
 
 /**
@@ -282,6 +280,12 @@ function do_shortcode_tag( $m ) {
 	$tag = $m[2];
 	$attr = shortcode_parse_atts( $m[3] );
 
+	if ( ! is_callable( $shortcode_tags[ $tag ] ) ) {
+		$message = sprintf( __( 'Attempting to parse a shortcode without a valid callback: %s' ), $tag );
+		_doing_it_wrong( __FUNCTION__, $message, '4.3.0' );
+		return $m[0];
+	}
+
 	if ( isset( $m[5] ) ) {
 		// enclosing tag - extra parameter
 		return $m[1] . call_user_func( $shortcode_tags[$tag], $attr, $m[5], $tag ) . $m[6];
@@ -305,7 +309,7 @@ function do_shortcode_tag( $m ) {
  */
 function shortcode_parse_atts($text) {
 	$atts = array();
-	$pattern = '/(\w+)\s*=\s*"([^"]*)"(?:\s|$)|(\w+)\s*=\s*\'([^\']*)\'(?:\s|$)|(\w+)\s*=\s*([^\s\'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|(\S+)(?:\s|$)/';
+	$pattern = '/([\w-]+)\s*=\s*"([^"]*)"(?:\s|$)|([\w-]+)\s*=\s*\'([^\']*)\'(?:\s|$)|([\w-]+)\s*=\s*([^\s\'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|(\S+)(?:\s|$)/';
 	$text = preg_replace("/[\x{00a0}\x{200b}]+/u", " ", $text);
 	if ( preg_match_all($pattern, $text, $match, PREG_SET_ORDER) ) {
 		foreach ($match as $m) {

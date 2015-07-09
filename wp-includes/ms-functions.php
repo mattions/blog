@@ -494,7 +494,11 @@ function wpmu_validate_user_signup($user_name, $user_email) {
 	if ( strlen( $user_name ) < 4 )
 		$errors->add('user_name',  __( 'Username must be at least 4 characters.' ) );
 
-	if ( strpos( ' ' . $user_name, '_' ) != false )
+	if ( strlen( $user_name ) > 60 ) {
+		$errors->add( 'user_name', __( 'Username may not be longer than 60 characters.' ) );
+	}
+
+	if ( strpos( $user_name, '_' ) !== false )
 		$errors->add( 'user_name', __( 'Sorry, usernames may not contain the character &#8220;_&#8221;!' ) );
 
 	// all numeric?
@@ -1863,7 +1867,7 @@ function global_terms( $term_id, $deprecated = '' ) {
 
 		clean_term_cache($term_id);
 	}
-	if( $recurse_start )
+	if ( $recurse_start )
 		$global_terms_recurse = null;
 
 	return $global_id;

@@ -225,7 +225,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 		foreach ( get_post_stati( array('show_in_admin_all_list' => false) ) as $state )
 			$total_posts -= $num_posts->$state;
 
-		if ( empty( $class ) && $this->is_base_request() && ! $this->user_posts_count ) {
+		if ( empty( $class ) && ( ( $this->is_base_request() && ! $this->user_posts_count ) || isset( $_REQUEST['all_posts'] ) ) ) {
 			$class =  ' class="current"';
 		}
 
@@ -824,7 +824,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 			_e( 'Published' );
 		} elseif ( 'future' == $post->post_status ) {
 			if ( $time_diff > 0 ) {
-				echo '<strong class="attention">' . __( 'Missed schedule' ) . '</strong>';
+				echo '<strong class="error-message">' . __( 'Missed schedule' ) . '</strong>';
 			} else {
 				_e( 'Scheduled' );
 			}
@@ -903,7 +903,7 @@ class WP_Posts_List_Table extends WP_List_Table {
 				/* translators: used between list items, there is a space after the comma */
 				echo join( __( ', ' ), $out );
 			} else {
-				echo '<span aria-hidden="true">&#8212;</span><span class="screen-reader-text">' . $taxonomy_object->labels->not_found . '</span>';
+				echo '<span aria-hidden="true">&#8212;</span><span class="screen-reader-text">' . $taxonomy_object->labels->no_terms . '</span>';
 			}
 			return;
 		}
@@ -973,7 +973,11 @@ class WP_Posts_List_Table extends WP_List_Table {
 				$classes .= ' hidden';
 			}
 
-			$attributes = "class='$classes'";
+			// Comments column uses HTML in the display name with screen reader text.
+			// Instead of using esc_attr(), we strip tags to get closer to a user-friendly string.
+  			$data = 'data-colname="' . wp_strip_all_tags( $column_display_name ) . '"';
+
+			$attributes = "class='$classes' $data";
 
 			if ( 'cb' === $column_name ) {
 				echo '<th scope="row" class="check-column">';
@@ -1211,10 +1215,10 @@ class WP_Posts_List_Table extends WP_List_Table {
 	endif; // post_type_supports title ?>
 
 	<?php if ( !$bulk ) : ?>
-			<label><span class="title"><?php _e( 'Date' ); ?></span></label>
-			<div class="inline-edit-date">
+			<fieldset class="inline-edit-date">
+			<legend><span class="title"><?php _e( 'Date' ); ?></span></legend>
 				<?php touch_time( 1, 1, 0, 1 ); ?>
-			</div>
+			</fieldset>
 			<br class="clear" />
 	<?php endif; // $bulk
 
@@ -1529,11 +1533,11 @@ class WP_Posts_List_Table extends WP_List_Table {
 		}
 	?>
 		<p class="submit inline-edit-save">
-			<a href="#inline-edit" class="button-secondary cancel alignleft"><?php _e( 'Cancel' ); ?></a>
+			<button type="button" class="button-secondary cancel alignleft"><?php _e( 'Cancel' ); ?></button>
 			<?php if ( ! $bulk ) {
 				wp_nonce_field( 'inlineeditnonce', '_inline_edit', false );
 				?>
-				<a href="#inline-edit" class="button-primary save alignright"><?php _e( 'Update' ); ?></a>
+				<button type="button" class="button-primary save alignright"><?php _e( 'Update' ); ?></button>
 				<span class="spinner"></span>
 			<?php } else {
 				submit_button( __( 'Update' ), 'button-primary alignright', 'bulk_edit', false );

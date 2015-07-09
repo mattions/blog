@@ -517,11 +517,11 @@ ul.add-menu-item-tabs li {
 }
 
 /* Sortables */
-li.menu-item.ui-sortable-helper dl {
+li.menu-item.ui-sortable-helper .menu-item-bar {
 	margin-top: 0;
 }
 
-li.menu-item.ui-sortable-helper .menu-item-transport dl {
+li.menu-item.ui-sortable-helper .menu-item-transport .menu-item-bar {
 	margin-top: 13px;
 }
 
@@ -573,11 +573,11 @@ body.menu-max-depth-11 { min-width: 1280px !important; }
 
 /* Menu item controls */
 .item-type {
-	color: #777;
-	font-size: 12px;
+	display: inline-block;
 	padding: 12px 10px;
+	color: #666;
+	font-size: 12px;
 	line-height: 18px;
-	display: block;
 }
 
 .item-controls {
