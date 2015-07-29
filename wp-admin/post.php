@@ -120,8 +120,9 @@ case 'post-quickdraft-save':
 	if ( ! wp_verify_nonce( $nonce, 'add-post' ) )
 		$error_msg = __( 'Unable to submit this form, please refresh and try again.' );
 
-	if ( ! current_user_can( 'edit_posts' ) )
-		$error_msg = __( 'Oops, you don&#8217;t have access to add new drafts.' );
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		exit;
+	}
 
 	if ( $error_msg )
 		return wp_dashboard_quick_press( $error_msg );
@@ -277,7 +278,7 @@ case 'untrash':
 		wp_die( __( 'Unknown post type.' ) );
 
 	if ( ! current_user_can( 'delete_post', $post_id ) )
-		wp_die( __( 'You are not allowed to move this item out of the Trash.' ) );
+		wp_die( __( 'You are not allowed to restore this item from the Trash.' ) );
 
 	if ( ! wp_untrash_post( $post_id ) )
 		wp_die( __( 'Error in restoring from Trash.' ) );

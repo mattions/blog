@@ -18,10 +18,7 @@
 	// Link settings.
 	api.Menus.data = {
 		nonce: '',
-		itemTypes: {
-			taxonomies: {},
-			postTypes: {}
-		},
+		itemTypes: [],
 		l10n: {},
 		menuItemTransport: 'postMessage',
 		phpIntMax: 0,
@@ -156,16 +153,18 @@
 			// Load more items.
 			this.sectionContent.scroll( function() {
 				var totalHeight = self.$el.find( '.accordion-section.open .accordion-section-content' ).prop( 'scrollHeight' ),
-				    visibleHeight = self.$el.find( '.accordion-section.open' ).height();
+					visibleHeight = self.$el.find( '.accordion-section.open' ).height();
+
 				if ( ! self.loading && $( this ).scrollTop() > 3 / 4 * totalHeight - visibleHeight ) {
 					var type = $( this ).data( 'type' ),
-					    obj_type = $( this ).data( 'obj_type' );
+						object = $( this ).data( 'object' );
+
 					if ( 'search' === type ) {
 						if ( self.searchTerm ) {
 							self.doSearch( self.pages.search );
 						}
 					} else {
-						self.loadItems( type, obj_type );
+						self.loadItems( type, object );
 					}
 				}
 			});
@@ -176,18 +175,22 @@
 
 		// Search input change handler.
 		search: function( event ) {
+			var $searchSection = $( '#available-menu-items-search' ),
+				$openSections = $( '#available-menu-items .accordion-section.open' );
+
 			if ( ! event ) {
 				return;
 			}
 			// Manual accordion-opening behavior.
-			if ( this.searchTerm && ! $( '#available-menu-items-search' ).hasClass( 'open' ) ) {
-				$( '#available-menu-items .accordion-section-content' ).slideUp( 'fast' );
-				$( '#available-menu-items-search .accordion-section-content' ).slideDown( 'fast' );
-				$( '#available-menu-items .accordion-section.open' ).removeClass( 'open' );
-				$( '#available-menu-items-search' ).addClass( 'open' );
+			if ( this.searchTerm && ! $searchSection.hasClass( 'open' ) ) {
+				$openSections.find( '.accordion-section-content' ).slideUp( 'fast' );
+				$searchSection.find( '.accordion-section-content' ).slideDown( 'fast' );
+				$openSections.find( '[aria-expanded]' ).first().attr( 'aria-expanded', 'false' );
+				$openSections.removeClass( 'open' );
+				$searchSection.addClass( 'open' );
 			}
 			if ( '' === event.target.value ) {
-				$( '#available-menu-items-search' ).removeClass( 'open' );
+				$searchSection.removeClass( 'open' );
 			}
 			if ( this.searchTerm === event.target.value ) {
 				return;
@@ -200,9 +203,9 @@
 		// Get search results.
 		doSearch: function( page ) {
 			var self = this, params,
-			    $section = $( '#available-menu-items-search' ),
-			    $content = $section.find( '.accordion-section-content' ),
-			    itemTemplate = wp.template( 'available-menu-item' );
+				$section = $( '#available-menu-items-search' ),
+				$content = $section.find( '.accordion-section-content' ),
+				itemTemplate = wp.template( 'available-menu-item' );
 
 			if ( self.currentRequest ) {
 				self.currentRequest.abort();
@@ -280,35 +283,29 @@
 			var self = this;
 
 			// Render the template for each item by type.
-			_.each( api.Menus.data.itemTypes, function( typeObjects, type ) {
-				_.each( typeObjects, function( typeObject, slug ) {
-					if ( 'postTypes' === type ) {
-						type = 'post_type';
-					} else if ( 'taxonomies' === type ) {
-						type = 'taxonomy';
-					}
-					self.pages[ slug ] = 0; // @todo should prefix with type
-					self.loadItems( slug, type );
-				} );
+			_.each( api.Menus.data.itemTypes, function( itemType ) {
+				self.pages[ itemType.type + ':' + itemType.object ] = 0;
+				self.loadItems( itemType.type, itemType.object ); // @todo we need to combine these Ajax requests.
 			} );
 		},
 
 		// Load available menu items.
-		loadItems: function( type, obj_type ) {
-			var self = this, params, request, itemTemplate;
+		loadItems: function( type, object ) {
+			var self = this, params, request, itemTemplate, availableMenuItemContainer;
 			itemTemplate = wp.template( 'available-menu-item' );
 
-			if ( 0 > self.pages[type] ) {
+			if ( -1 === self.pages[ type + ':' + object ] ) {
 				return;
 			}
-			$( '#available-menu-items-' + type + ' .accordion-section-title' ).addClass( 'loading' );
+			availableMenuItemContainer = $( '#available-menu-items-' + type + '-' + object );
+			availableMenuItemContainer.find( '.accordion-section-title' ).addClass( 'loading' );
 			self.loading = true;
 			params = {
 				'customize-menus-nonce': api.Menus.data.nonce,
 				'wp_customize': 'on',
 				'type': type,
-				'obj_type': obj_type,
-				'page': self.pages[ type ]
+				'object': object,
+				'page': self.pages[ type + ':' + object ]
 			};
 			request = wp.ajax.post( 'load-available-menu-items-customizer', params );
 
@@ -316,16 +313,23 @@
 				var items, typeInner;
 				items = data.items;
 				if ( 0 === items.length ) {
-					self.pages[ type ] = -1;
+					if ( 0 === self.pages[ type + ':' + object ] ) {
+						availableMenuItemContainer
+							.addClass( 'cannot-expand' )
+							.removeClass( 'loading' )
+							.find( '.accordion-section-title > button' )
+							.prop( 'tabIndex', -1 );
+					}
+					self.pages[ type + ':' + object ] = -1;
 					return;
 				}
 				items = new api.Menus.AvailableItemCollection( items ); // @todo Why is this collection created and then thrown away?
 				self.collection.add( items.models );
-				typeInner = $( '#available-menu-items-' + type + ' .accordion-section-content' );
-				items.each(function( menu_item ) {
-					typeInner.append( itemTemplate( menu_item.attributes ) );
+				typeInner = availableMenuItemContainer.find( '.accordion-section-content' );
+				items.each(function( menuItem ) {
+					typeInner.append( itemTemplate( menuItem.attributes ) );
 				});
-				self.pages[ type ] = self.pages[ type ] + 1;
+				self.pages[ type + ':' + object ] += 1;
 			});
 			request.fail(function( data ) {
 				if ( typeof console !== 'undefined' && console.error ) {
@@ -333,7 +337,7 @@
 				}
 			});
 			request.always(function() {
-				$( '#available-menu-items-' + type + ' .accordion-section-title' ).removeClass( 'loading' );
+				availableMenuItemContainer.find( '.accordion-section-title' ).removeClass( 'loading' );
 				self.loading = false;
 			});
 		},
@@ -673,10 +677,22 @@
 			});
 
 			section.refreshAssignedLocations();
+
+			api.bind( 'pane-contents-reflowed', function() {
+				// Skip menus that have been removed.
+				if ( ! section.container.parent().length ) {
+					return;
+				}
+				section.container.find( '.menu-item .menu-item-reorder-nav button' ).attr({ 'tabindex': '0', 'aria-hidden': 'false' });
+				section.container.find( '.menu-item.move-up-disabled .menus-move-up' ).attr({ 'tabindex': '-1', 'aria-hidden': 'true' });
+				section.container.find( '.menu-item.move-down-disabled .menus-move-down' ).attr({ 'tabindex': '-1', 'aria-hidden': 'true' });
+				section.container.find( '.menu-item.move-left-disabled .menus-move-left' ).attr({ 'tabindex': '-1', 'aria-hidden': 'true' });
+				section.container.find( '.menu-item.move-right-disabled .menus-move-right' ).attr({ 'tabindex': '-1', 'aria-hidden': 'true' });
+			} );
 		},
 
 		populateControls: function() {
-			var section = this, menuNameControlId, menuControl, menuNameControl;
+			var section = this, menuNameControlId, menuAutoAddControlId, menuControl, menuNameControl, menuAutoAddControl;
 
 			// Add the control for managing the menu name.
 			menuNameControlId = section.id + '[name]';
@@ -685,8 +701,8 @@
 				menuNameControl = new api.controlConstructor.nav_menu_name( menuNameControlId, {
 					params: {
 						type: 'nav_menu_name',
-						content: '<li id="customize-control-' + section.id.replace( '[', '-' ).replace( ']', '' ) + '-name" class="customize-control customize-control-nav_menu_name"></li>', // @todo core should do this for us
-						label: '',
+						content: '<li id="customize-control-' + section.id.replace( '[', '-' ).replace( ']', '' ) + '-name" class="customize-control customize-control-nav_menu_name"></li>', // @todo core should do this for us; see #30741
+						label: api.Menus.data.l10n.menuNameLabel,
 						active: true,
 						section: section.id,
 						priority: 0,
@@ -705,9 +721,9 @@
 				menuControl = new api.controlConstructor.nav_menu( section.id, {
 					params: {
 						type: 'nav_menu',
-						content: '<li id="customize-control-' + section.id.replace( '[', '-' ).replace( ']', '' ) + '" class="customize-control customize-control-nav_menu"></li>', // @todo core should do this for us
+						content: '<li id="customize-control-' + section.id.replace( '[', '-' ).replace( ']', '' ) + '" class="customize-control customize-control-nav_menu"></li>', // @todo core should do this for us; see #30741
 						section: section.id,
-						priority: 999,
+						priority: 998,
 						active: true,
 						settings: {
 							'default': section.id
@@ -717,6 +733,27 @@
 				} );
 				api.control.add( menuControl.id, menuControl );
 				menuControl.active.set( true );
+			}
+
+			// Add the control for managing the menu auto_add.
+			menuAutoAddControlId = section.id + '[auto_add]';
+			menuAutoAddControl = api.control( menuAutoAddControlId );
+			if ( ! menuAutoAddControl ) {
+				menuAutoAddControl = new api.controlConstructor.nav_menu_auto_add( menuAutoAddControlId, {
+					params: {
+						type: 'nav_menu_auto_add',
+						content: '<li id="customize-control-' + section.id.replace( '[', '-' ).replace( ']', '' ) + '-auto-add" class="customize-control customize-control-nav_menu_auto_add"></li>', // @todo core should do this for us
+						label: '',
+						active: true,
+						section: section.id,
+						priority: 999,
+						settings: {
+							'default': section.id
+						}
+					}
+				} );
+				api.control.add( menuAutoAddControl.id, menuAutoAddControl );
+				menuAutoAddControl.active.set( true );
 			}
 
 		},
@@ -1125,21 +1162,21 @@
 
 			$removeBtn.on( 'click', function() {
 				// Find an adjacent element to add focus to when this menu item goes away
-				var $adjacentFocusTarget;
-				if ( control.container.next().is( '.customize-control-nav_menu_item' ) ) {
-					if ( ! $( 'body' ).hasClass( 'adding-menu-items' ) ) {
-						$adjacentFocusTarget = control.container.next().find( '.item-edit:first' );
-					} else {
-						$adjacentFocusTarget = control.container.next().find( '.item-delete:first' );
-					}
-				} else if ( control.container.prev().is( '.customize-control-nav_menu_item' ) ) {
-					if ( ! $( 'body' ).hasClass( 'adding-menu-items' ) ) {
-						$adjacentFocusTarget = control.container.prev().find( '.item-edit:first' );
-					} else {
-						$adjacentFocusTarget = control.container.prev().find( '.item-delete:first' );
-					}
+				var addingItems = true, $adjacentFocusTarget, $next, $prev;
+
+				if ( ! $( 'body' ).hasClass( 'adding-menu-items' ) ) {
+					addingItems = false;
+				}
+
+				$next = control.container.nextAll( '.customize-control-nav_menu_item:visible' ).first();
+				$prev = control.container.prevAll( '.customize-control-nav_menu_item:visible' ).first();
+
+				if ( $next.length ) {
+					$adjacentFocusTarget = $next.find( false === addingItems ? '.item-edit' : '.item-delete' ).first();
+				} else if ( $prev.length ) {
+					$adjacentFocusTarget = $prev.find( false === addingItems ? '.item-edit' : '.item-delete' ).first();
 				} else {
-					$adjacentFocusTarget = control.container.next( '.customize-control-nav_menu' ).find( '.add-new-menu-item' );
+					$adjacentFocusTarget = control.container.nextAll( '.customize-control-nav_menu' ).find( '.add-new-menu-item' ).first();
 				}
 
 				control.container.slideUp( function() {
@@ -1235,7 +1272,7 @@
 			}
 
 			control.params.el_classes = containerClasses.join( ' ' );
-			control.params.item_type_label = api.Menus.getTypeLabel( settingValue.type, settingValue.object );
+			control.params.item_type_label = settingValue.type_label;
 			control.params.item_type = settingValue.type;
 			control.params.url = settingValue.url;
 			control.params.target = settingValue.target;
@@ -1592,6 +1629,52 @@
 	});
 
 	/**
+	 * wp.customize.Menus.MenuAutoAddControl
+	 *
+	 * Customizer control for a nav menu's auto add.
+	 *
+	 * @constructor
+	 * @augments wp.customize.Control
+	 */
+	api.Menus.MenuAutoAddControl = api.Control.extend({
+
+		ready: function() {
+			var control = this,
+				settingValue = control.setting();
+
+			/*
+			 * Since the control is not registered in PHP, we need to prevent the
+			 * preview's sending of the activeControls to result in this control
+			 * being deactivated.
+			 */
+			control.active.validate = function() {
+				return api.section( control.section() ).active();
+			};
+
+			control.autoAddElement = new api.Element( control.container.find( 'input[type=checkbox].auto_add' ) );
+
+			control.autoAddElement.bind(function( value ) {
+				var settingValue = control.setting();
+				if ( settingValue && settingValue.name !== value ) {
+					settingValue = _.clone( settingValue );
+					settingValue.auto_add = value;
+					control.setting.set( settingValue );
+				}
+			});
+			if ( settingValue ) {
+				control.autoAddElement.set( settingValue.auto_add );
+			}
+
+			control.setting.bind(function( object ) {
+				if ( object ) {
+					control.autoAddElement.set( object.auto_add );
+				}
+			});
+		}
+
+	});
+
+	/**
 	 * wp.customize.Menus.MenuControl
 	 *
 	 * Customizer control for menus.
@@ -1661,25 +1744,6 @@
 		_setupModel: function() {
 			var control = this,
 				menuId = control.params.menu_id;
-
-			control.elements = {};
-			control.elements.auto_add = new api.Element( control.container.find( 'input[type=checkbox].auto_add' ) );
-
-			control.elements.auto_add.bind(function( auto_add ) {
-				var settingValue = control.setting();
-				if ( settingValue && settingValue.auto_add !== auto_add ) {
-					settingValue = _.clone( settingValue );
-					settingValue.auto_add = auto_add;
-					control.setting.set( settingValue );
-				}
-			});
-			control.elements.auto_add.set( control.setting().auto_add );
-			control.setting.bind(function( object ) {
-				if ( ! object ) {
-					return;
-				}
-				control.elements.auto_add.set( object.auto_add );
-			});
 
 			control.setting.bind( function( to ) {
 				var name;
@@ -1933,7 +1997,8 @@
 		 */
 		toggleReordering: function( showOrHide ) {
 			var addNewItemBtn = this.container.find( '.add-new-menu-item' ),
-				reorderBtn = this.container.find( '.reorder-toggle' );
+				reorderBtn = this.container.find( '.reorder-toggle' ),
+				itemsTitle = this.$sectionContent.find( '.item-title' );
 
 			showOrHide = Boolean( showOrHide );
 
@@ -1945,13 +2010,15 @@
 			this.$sectionContent.toggleClass( 'reordering', showOrHide );
 			this.$sectionContent.sortable( this.isReordering ? 'disable' : 'enable' );
 			if ( this.isReordering ) {
-				addNewItemBtn.attr( 'tabindex', '-1' );
-				reorderBtn.find( '.reorder-done' ).focus();
+				addNewItemBtn.attr({ 'tabindex': '-1', 'aria-hidden': 'true' });
+				reorderBtn.attr( 'aria-label', api.Menus.data.l10n.reorderLabelOff );
 				wp.a11y.speak( api.Menus.data.l10n.reorderModeOn );
+				itemsTitle.attr( 'aria-hidden', 'false' );
 			} else {
-				addNewItemBtn.removeAttr( 'tabindex' );
-				reorderBtn.find( '.reorder' ).focus();
+				addNewItemBtn.removeAttr( 'tabindex aria-hidden' );
+				reorderBtn.attr( 'aria-label', api.Menus.data.l10n.reorderLabelOn );
 				wp.a11y.speak( api.Menus.data.l10n.reorderModeOff );
+				itemsTitle.attr( 'aria-hidden', 'true' );
 			}
 
 			if ( showOrHide ) {
@@ -1983,7 +2050,6 @@
 		 */
 		reflowMenuItems: function() {
 			var menuControl = this,
-				menuSection = api.section( 'nav_menu[' + String( menuControl.params.menu_id ) + ']' ),
 				menuItemControls = menuControl.getMenuItemControls(),
 				reflowRecursively;
 
@@ -2049,12 +2115,6 @@
 				currentDepth: 0,
 				currentAbsolutePosition: 0
 			} );
-
-			menuSection.container.find( '.menu-item .menu-item-reorder-nav button' ).prop( 'tabIndex', 0 );
-			menuSection.container.find( '.menu-item.move-up-disabled .menus-move-up' ).prop( 'tabIndex', -1 );
-			menuSection.container.find( '.menu-item.move-down-disabled .menus-move-down' ).prop( 'tabIndex', -1 );
-			menuSection.container.find( '.menu-item.move-left-disabled .menus-move-left' ).prop( 'tabIndex', -1 );
-			menuSection.container.find( '.menu-item.move-right-disabled .menus-move-right' ).prop( 'tabIndex', -1 );
 
 			menuControl.container.find( '.reorder-toggle' ).toggle( menuItemControls.length > 1 );
 		},
@@ -2244,6 +2304,7 @@
 		nav_menu_item: api.Menus.MenuItemControl,
 		nav_menu: api.Menus.MenuControl,
 		nav_menu_name: api.Menus.MenuNameControl,
+		nav_menu_auto_add: api.Menus.MenuAutoAddControl,
 		new_menu: api.Menus.NewMenuControl
 	});
 
@@ -2488,36 +2549,6 @@
 	 */
 	api.Menus.getMenuControl = function( menuId ) {
 		return api.control( 'nav_menu[' + menuId + ']' );
-	};
-
-	/**
-	 * Given a menu item type & object, get the label associated with it.
-	 *
-	 * @param {string} type
-	 * @param {string} object
-	 * @return {string}
-	 */
-	api.Menus.getTypeLabel = function( type, object ) {
-		var label,
-			data = api.Menus.data;
-
-		if ( 'post_type' === type ) {
-			if ( data.itemTypes.postTypes[ object ] ) {
-				label = data.itemTypes.postTypes[ object ].label;
-			} else {
-				label = data.l10n.postTypeLabel;
-			}
-		} else if ( 'taxonomy' === type ) {
-			if ( data.itemTypes.taxonomies[ object ] ) {
-				label = data.itemTypes.taxonomies[ object ].label;
-			} else {
-				label = data.l10n.taxonomyTermLabel;
-			}
-		} else {
-			label = data.l10n.custom_label;
-		}
-
-		return label;
 	};
 
 	/**

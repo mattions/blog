@@ -1,7 +1,5 @@
 /* global tinymce */
 
-window.wp = window.wp || {};
-
 /*
  * The TinyMCE view API.
  *
@@ -24,7 +22,7 @@ window.wp = window.wp || {};
  * |- registered view
  * |  |- ...
  */
-( function( window, wp, $ ) {
+( function( window, wp, shortcode, $ ) {
 	'use strict';
 
 	var views = {},
@@ -145,22 +143,26 @@ window.wp = window.wp || {};
 		/**
 		 * Create a view instance.
 		 *
-		 * @param {String} type    The view type.
-		 * @param {String} text    The textual representation of the view.
-		 * @param {Object} options Options.
+		 * @param {String}  type    The view type.
+		 * @param {String}  text    The textual representation of the view.
+		 * @param {Object}  options Options.
+		 * @param {Boolean} force   Recreate the instance. Optional.
 		 *
 		 * @return {wp.mce.View} The view instance.
 		 */
-		createInstance: function( type, text, options ) {
+		createInstance: function( type, text, options, force ) {
 			var View = this.get( type ),
 				encodedText,
 				instance;
 
 			text = tinymce.DOM.decode( text );
-			instance = this.getInstance( text );
 
-			if ( instance ) {
-				return instance;
+			if ( ! force ) {
+				instance = this.getInstance( text );
+
+				if ( instance ) {
+					return instance;
+				}
 			}
 
 			encodedText = encodeURIComponent( text );
@@ -216,12 +218,13 @@ window.wp = window.wp || {};
 		 * @param {String}         text   The new text.
 		 * @param {tinymce.Editor} editor The TinyMCE editor instance the view node is in.
 		 * @param {HTMLElement}    node   The view node to update.
+		 * @param {Boolean}        force  Recreate the instance. Optional.
 		 */
-		update: function( text, editor, node ) {
+		update: function( text, editor, node, force ) {
 			var instance = this.getInstance( node );
 
 			if ( instance ) {
-				instance.update( text, editor, node );
+				instance.update( text, editor, node, force );
 			}
 		},
 
@@ -235,8 +238,8 @@ window.wp = window.wp || {};
 			var instance = this.getInstance( node );
 
 			if ( instance && instance.edit ) {
-				instance.edit( instance.text, function( text ) {
-					instance.update( text, editor, node );
+				instance.edit( instance.text, function( text, force ) {
+					instance.update( text, editor, node, force );
 				} );
 			}
 		},
@@ -302,8 +305,8 @@ window.wp = window.wp || {};
 		/**
 		 * Renders all view nodes tied to this view instance that are not yet rendered.
 		 *
-		 * @param {String} content The content to render. Optional.
-		 * @param {Boolean} force Rerender all view nodes tied to this view instance.
+		 * @param {String}  content The content to render. Optional.
+		 * @param {Boolean} force   Rerender all view nodes tied to this view instance. Optional.
 		 */
 		render: function( content, force ) {
 			if ( content != null ) {
@@ -647,7 +650,7 @@ window.wp = window.wp || {};
 		 * Sets an error for all view nodes tied to this view instance.
 		 *
 		 * @param {String} message  The error message to set.
-		 * @param {String} dashicon A dashicon ID (optional). {@link https://developer.wordpress.org/resource/dashicons/}
+		 * @param {String} dashicon A dashicon ID. Optional. {@link https://developer.wordpress.org/resource/dashicons/}
 		 */
 		setError: function( message, dashicon ) {
 			this.setContent(
@@ -666,7 +669,7 @@ window.wp = window.wp || {};
 		 * @return {Object}
 		 */
 		match: function( content ) {
-			var match = wp.shortcode.next( this.type, content );
+			var match = shortcode.next( this.type, content );
 
 			if ( match ) {
 				return {
@@ -685,15 +688,16 @@ window.wp = window.wp || {};
 		 * @param {String}         text   The new text.
 		 * @param {tinymce.Editor} editor The TinyMCE editor instance the view node is in.
 		 * @param {HTMLElement}    node   The view node to update.
+		 * @param {Boolean}        force  Recreate the instance. Optional.
 		 */
-		update: function( text, editor, node ) {
+		update: function( text, editor, node, force ) {
 			_.find( views, function( view, type ) {
 				var match = view.prototype.match( text );
 
 				if ( match ) {
 					$( node ).data( 'rendered', false );
 					editor.dom.setAttrib( node, 'data-wpview-text', encodeURIComponent( text ) );
-					wp.mce.views.createInstance( type, text, match.options ).render();
+					wp.mce.views.createInstance( type, text, match.options, force ).render();
 					editor.focus();
 
 					return true;
@@ -714,29 +718,28 @@ window.wp = window.wp || {};
 			editor.focus();
 		}
 	} );
-} )( window, window.wp, window.jQuery );
+} )( window, window.wp, window.wp.shortcode, window.jQuery );
 
 /*
  * The WordPress core TinyMCE views.
  * Views for the gallery, audio, video, playlist and embed shortcodes,
  * and a view for embeddable URLs.
  */
-( function( window, views, $ ) {
-	var postID = $( '#post_ID' ).val() || 0,
-		media, gallery, av, embed;
+( function( window, views, media, $ ) {
+	var base, gallery, av, embed;
 
-	media = {
+	base = {
 		state: [],
 
 		edit: function( text, update ) {
-			var media = wp.media[ this.type ],
-				frame = media.edit( text );
+			var type = this.type,
+				frame = media[ type ].edit( text );
 
 			this.pausePlayers && this.pausePlayers();
 
 			_.each( this.state, function( state ) {
 				frame.state( state ).on( 'update', function( selection ) {
-					update( media.shortcode( selection ).string() );
+					update( media[ type ].shortcode( selection ).string(), type === 'gallery' );
 				} );
 			} );
 
@@ -748,12 +751,12 @@ window.wp = window.wp || {};
 		}
 	};
 
-	gallery = _.extend( {}, media, {
+	gallery = _.extend( {}, base, {
 		state: [ 'gallery-edit' ],
-		template: wp.media.template( 'editor-gallery' ),
+		template: media.template( 'editor-gallery' ),
 
 		initialize: function() {
-			var attachments = wp.media.gallery.attachments( this.shortcode, postID ),
+			var attachments = media.gallery.attachments( this.shortcode, media.view.settings.post.id ),
 				attrs = this.shortcode.attrs.named,
 				self = this;
 
@@ -775,7 +778,7 @@ window.wp = window.wp || {};
 
 				self.render( self.template( {
 					attachments: attachments,
-					columns: attrs.columns ? parseInt( attrs.columns, 10 ) : wp.media.galleryDefaults.columns
+					columns: attrs.columns ? parseInt( attrs.columns, 10 ) : media.galleryDefaults.columns
 				} ) );
 			} )
 			.fail( function( jqXHR, textStatus ) {
@@ -784,7 +787,7 @@ window.wp = window.wp || {};
 		}
 	} );
 
-	av = _.extend( {}, media, {
+	av = _.extend( {}, base, {
 		action: 'parse-media-shortcode',
 
 		initialize: function() {
@@ -792,13 +795,13 @@ window.wp = window.wp || {};
 
 			if ( this.url ) {
 				this.loader = false;
-				this.shortcode = wp.media.embed.shortcode( {
+				this.shortcode = media.embed.shortcode( {
 					url: this.text
 				} );
 			}
 
 			wp.ajax.post( this.action, {
-				post_ID: postID,
+				post_ID: media.view.settings.post.id,
 				type: this.shortcode.tag,
 				shortcode: this.shortcode.string()
 			} )
@@ -839,8 +842,7 @@ window.wp = window.wp || {};
 		action: 'parse-embed',
 
 		edit: function( text, update ) {
-			var media = wp.media.embed,
-				frame = media.edit( text, this.url ),
+			var frame = media.embed.edit( text, this.url ),
 				self = this;
 
 			this.pausePlayers();
@@ -857,7 +859,7 @@ window.wp = window.wp || {};
 				if ( self.url ) {
 					update( data.url );
 				} else {
-					update( media.shortcode( data ).string() );
+					update( media.embed.shortcode( data ).string() );
 				}
 			} );
 
@@ -901,4 +903,4 @@ window.wp = window.wp || {};
 			}
 		}
 	} ) );
-} )( window, window.wp.mce.views, window.jQuery );
+} )( window, window.wp.mce.views, window.wp.media, window.jQuery );
