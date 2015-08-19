@@ -12,22 +12,29 @@
 		$weakRow,
 		$weakCheckbox,
 
+		$toggleButton,
 		$submitButtons,
-		$submitButton;
+		$submitButton,
+		currentPass;
 
 	function generatePassword() {
 		if ( typeof zxcvbn !== 'function' ) {
-		   setTimeout( generatePassword, 50 );
+			setTimeout( generatePassword, 50 );
 		} else {
-		   $pass1.val( $pass1.data( 'pw' ) );
-		   $pass1.trigger( 'propertychange' );
-		   $pass1Wrap.addClass( 'show-password' );
+			$pass1.val( $pass1.data( 'pw' ) );
+			$pass1.trigger( 'pwupdate' );
+			if ( 1 !== parseInt( $toggleButton.data( 'start-masked' ), 10 ) ) {
+				$pass1Wrap.addClass( 'show-password' );
+			} else {
+				$toggleButton.trigger( 'click' );
+			}
 		}
 	}
 
 	function bindPass1() {
 		var passStrength = $('#pass-strength-result')[0];
-		var currentPass = $pass1.val();
+
+		currentPass = $pass1.val();
 
 		$pass1Wrap = $pass1.parent();
 
@@ -40,8 +47,13 @@
 			.addClass( $pass1[0].className )
 			.data( 'pw', $pass1.data( 'pw' ) )
 			.val( $pass1.val() )
-			.on( 'input', function () {
-				$pass1.val( $pass1Text.val() ).trigger( 'propertychange' );
+			.on( 'keyup', function () {
+				if ( $pass1Text.val() === currentPass ) {
+					return;
+				}
+				$pass2.val( $pass1Text.val() );
+				$pass1.val( $pass1Text.val() ).trigger( 'pwupdate' );
+				currentPass = $pass1Text.val();
 			} );
 
 		$pass1.after( $pass1Text );
@@ -50,13 +62,15 @@
 			generatePassword();
 		}
 
-		$pass1.on( 'input propertychange', function () {
+		$pass1.on( 'keyup pwupdate', function () {
 			if ( $pass1.val() === currentPass ) {
 				return;
 			}
 
 			currentPass = $pass1.val();
-			$pass1Text.val( currentPass );
+			if ( $pass1Text.val() !== currentPass ) {
+				$pass1Text.val( currentPass );
+			}
 			$pass1.add( $pass1Text ).removeClass( 'short bad good strong' );
 
 			if ( passStrength.className ) {
@@ -75,11 +89,11 @@
 	}
 
 	function bindToggleButton() {
-		var toggleButton = $pass1Row.find('.wp-hide-pw');
-		toggleButton.show().on( 'click', function () {
-			if ( 1 === parseInt( toggleButton.data( 'toggle' ), 10 ) ) {
+		$toggleButton = $pass1Row.find('.wp-hide-pw');
+		$toggleButton.show().on( 'click', function () {
+			if ( 1 === parseInt( $toggleButton.data( 'toggle' ), 10 ) ) {
 				$pass1Wrap.addClass( 'show-password' );
-				toggleButton
+				$toggleButton
 					.data( 'toggle', 0 )
 					.attr({
 						'aria-label': userProfileL10n.ariaHide
@@ -98,7 +112,7 @@
 				}
 			} else {
 				$pass1Wrap.removeClass( 'show-password' );
-				toggleButton
+				$toggleButton
 					.data( 'toggle', 1 )
 					.attr({
 						'aria-label': userProfileL10n.ariaShow
@@ -149,12 +163,14 @@
 		 * Fix a LastPass mismatch issue, LastPass only changes pass2.
 		 *
 		 * This fixes the issue by copying any changes from the hidden
-		 * pass2 field to the pass1 field.
+		 * pass2 field to the pass1 field, then running check_pass_strength.
 		 */
-		$pass2 = $('#pass2').on( 'input propertychange', function () {
+		$pass2 = $('#pass2').on( 'keyup', function () {
 			if ( $pass2.val().length > 0 ) {
 				$pass1.val( $pass2.val() );
-				$pass1.trigger( 'propertychange' );
+				$pass2.val('');
+				currentPass = '';
+				$pass1.trigger( 'pwupdate' );
 			}
 		} );
 
@@ -169,7 +185,9 @@
 			$generateButton.hide();
 			$passwordWrapper.show();
 
-			generatePassword();
+			if ( $pass1Text.val().length === 0 ) {
+				generatePassword();
+			}
 
 			_.defer( function() {
 				$pass1Text.focus();
@@ -196,7 +214,7 @@
 	}
 
 	function check_pass_strength() {
-		var pass1 = $('#pass1').val(), pass2 = $('#pass2').val(), strength;
+		var pass1 = $('#pass1').val(), strength;
 
 		$('#pass-strength-result').removeClass('short bad good strong');
 		if ( ! pass1 ) {
@@ -204,7 +222,7 @@
 			return;
 		}
 
-		strength = wp.passwordStrength.meter( pass1, wp.passwordStrength.userInputBlacklist(), pass2 );
+		strength = wp.passwordStrength.meter( pass1, wp.passwordStrength.userInputBlacklist(), pass1 );
 
 		switch ( strength ) {
 			case 2:
@@ -228,8 +246,7 @@
 		var $colorpicker, $stylesheet, user_id, current_user_id,
 			select = $( '#display_name' );
 
-		$('#pass1').val('').on( 'input propertychange', check_pass_strength );
-		$('#pass2').val('').on( 'input propertychange', check_pass_strength );
+		$('#pass1').val('').on( 'keyup pwupdate', check_pass_strength );
 		$('#pass-strength-result').show();
 		$('.color-palette').click( function() {
 			$(this).siblings('input[name="admin_color"]').prop('checked', true);
