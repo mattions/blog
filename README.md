@@ -2,8 +2,9 @@
 
 	git checkout master
 	git pull wordpress master:master
+	git pull --tags
 	git checkout production
-	git merge master
+	git merge $TAG
 
 #Deploy
 
