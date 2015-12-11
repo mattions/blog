@@ -2,7 +2,7 @@
 
 	git checkout master
 	git pull wordpress master:master
-	git pull --tags
+	git fetch --tags wordpress
 	git checkout production
 	git merge $TAG
 
