@@ -161,14 +161,38 @@
 
 /* 1.2 - Structure */
 
-.about-wrap [class$=col] .col {
-	float: left;
-	position: relative;
+.about-wrap [class$="-col"] {
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: -webkit-box;
+	display: -moz-box;
+	display: flex;
+	-webkit-box-pack: justify;
+	-webkit-justify-content: space-between;
+	-moz-box-pack: justify;
+	-ms-flex-pack: justify;
+	justify-content: space-between;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-moz-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-flex-wrap: wrap;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
 }
 
-.about-wrap .two-col .col {
-	margin-right: 4.799999999%;
-	width: 47.6%;
+.about-wrap .feature-section.one-col {
+	margin: 0 auto;
+	max-width: 700px;
+}
+
+.about-wrap [class$="-col"] .col {
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
+	flex: 1;
 }
 .about-wrap .feature-section.two-col .col {
 	display: inline-block;
@@ -178,30 +202,20 @@
 	vertical-align: middle;
 }
 
-.about-wrap .two-col img {
-	margin-bottom: 1.5em;
-}
-
-.about-wrap .feature-section.two-col .col {
-	display: inline-block;
-	float: none;
-	margin-top: 1em;
-	margin-right: 4.799999999%;
-	width: -webkit-calc( 47.6% - 4px );
-	width: calc( 47.6% - 4px );
-	vertical-align: top;
+.about-wrap .two-col .col {
+	min-width: 47%;
+	max-width: 47%;
 }
 
 .about-wrap .three-col .col {
-	margin-right: 4.999999999%;
-	width: 29.95%;
+	-webkit-align-self: flex-start;
+	-ms-flex-item-align: start;
+	align-self: flex-start;
+	min-width: 31%;
+	max-width: 31%;
 }
 
-.about-wrap .two-col .col:nth-of-type(2n),
-.about-wrap .three-col .col:nth-of-type(3n) {
-	margin-right: 0;
-}
-
+<<<<<<< HEAD
 .about-wrap .under-the-hood {
 	clear: both;
 	overflow: hidden;
@@ -213,6 +227,10 @@
 
 .about-wrap .feature-video .mejs-overlay-loading span {
 	background: transparent; /* Hide loading.gif */
+=======
+.about-wrap .two-col img {
+	margin-bottom: 1.5em;
+>>>>>>> 4.8
 }
 
 .about-wrap .feature-video .mejs-controls {
@@ -311,11 +329,14 @@
 
 .about-wrap .feature-section.no-heading {
 	padding-top: 35px;
+<<<<<<< HEAD
 }
 
 .about-wrap .headline-feature {
 	margin: 0 auto;
 	max-width: 80%;
+=======
+>>>>>>> 4.8
 }
 
 .about-wrap .feature-section .media-container {
@@ -461,6 +482,11 @@
 		column-count: 1;
 	}
 
+	.about-wrap .two-col .col,
+	.about-wrap .three-col .col {
+		min-width: 48% !important;
+	}
+
 	.about-wrap .three-col img {
 		display: block;
 		margin: 0 auto;
@@ -490,8 +516,7 @@
 
 	.about-wrap .two-col .col,
 	.about-wrap .three-col .col {
-		width: 100% !important;
-		float: none !important;
+		min-width: 100% !important;
 	}
 
 	.about-wrap .under-the-hood.three-col .col,
