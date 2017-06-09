@@ -1,13 +1,8 @@
 === Twenty Seventeen ===
 Contributors: the WordPress team
 Requires at least: WordPress 4.7
-<<<<<<< HEAD
-Tested up to: WordPress 4.7
-Version: 1.2
-=======
 Tested up to: WordPress 4.9-trunk
 Version: 1.3
->>>>>>> 4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: one-column, two-columns, right-sidebar, flexible-header, accessibility-ready, custom-colors, custom-header, custom-menu, custom-logo, editor-style, featured-images, footer-widgets, post-formats, rtl-language-support, sticky-post, theme-options, threaded-comments, translation-ready
@@ -65,14 +60,11 @@ Source: https://unsplash.com/@englr?photo=bIhpiQA009k
 
 == Changelog ==
 
-<<<<<<< HEAD
-=======
 = 1.3 =
 * Released: June 8, 2017
 
 https://codex.wordpress.org/Twenty_Seventeen_Theme_Changelog#Version_1.3
 
->>>>>>> 4.8
 = 1.2 =
 * Released: April 18, 2017
 

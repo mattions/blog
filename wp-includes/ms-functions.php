@@ -682,9 +682,6 @@ function wpmu_signup_blog( $domain, $path, $title, $user, $user_email, $meta = a
 	global $wpdb;
 
 	$key = substr( md5( time() . wp_rand() . $domain ), 0, 16 );
-<<<<<<< HEAD
-	$meta = serialize($meta);
-=======
 
 	/**
 	 * Filters the metadata for a site signup.
@@ -702,7 +699,6 @@ function wpmu_signup_blog( $domain, $path, $title, $user, $user_email, $meta = a
 	 * @param string $key        The user's activation key.
 	 */
 	$meta = apply_filters( 'signup_site_meta', $meta, $domain, $path, $title, $user, $user_email, $key );
->>>>>>> 4.8
 
 	$wpdb->insert( $wpdb->signups, array(
 		'domain' => $domain,
@@ -752,9 +748,6 @@ function wpmu_signup_user( $user, $user_email, $meta = array() ) {
 	$user = preg_replace( '/\s+/', '', sanitize_user( $user, true ) );
 	$user_email = sanitize_email( $user_email );
 	$key = substr( md5( time() . wp_rand() . $user_email ), 0, 16 );
-<<<<<<< HEAD
-	$meta = serialize($meta);
-=======
 
 	/**
 	 * Filters the metadata for a user signup.
@@ -769,7 +762,6 @@ function wpmu_signup_user( $user, $user_email, $meta = array() ) {
 	 * @param string $key        The user's activation key.
 	 */
 	$meta = apply_filters( 'signup_user_meta', $meta, $user, $user_email, $key );
->>>>>>> 4.8
 
 	$wpdb->insert( $wpdb->signups, array(
 		'domain' => '',

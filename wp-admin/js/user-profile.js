@@ -122,8 +122,6 @@
 
 				resetToggle();
 
-				$pass1Label.attr( 'for', 'pass1-text' );
-
 				if ( ! _.isUndefined( $pass1Text[0].setSelectionRange ) ) {
 					$pass1Text[0].setSelectionRange( 0, 100 );
 				}

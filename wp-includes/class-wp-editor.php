@@ -1500,20 +1500,10 @@ final class _WP_Editors {
 			var init, id, $wrap;
 
 			if ( typeof tinymce !== 'undefined' ) {
-<<<<<<< HEAD
-				// Fix RTL
-				tinymce.on( 'addeditor', function( event ) {
-					event.editor.rtl = event.editor.settings.rtl_ui ||
-						( event.editor.editorManager &&
-						event.editor.editorManager.i18n &&
-						event.editor.editorManager.i18n.rtl );
-				}, true );
-=======
 				if ( tinymce.Env.ie && tinymce.Env.ie < 11 ) {
 					tinymce.$( '.wp-editor-wrap ' ).removeClass( 'tmce-active' ).addClass( 'html-active' );
 					return;
 				}
->>>>>>> 4.8
 
 				for ( id in tinyMCEPreInit.mceInit ) {
 					init = tinyMCEPreInit.mceInit[id];

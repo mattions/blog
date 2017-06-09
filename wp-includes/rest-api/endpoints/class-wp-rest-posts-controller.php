@@ -160,11 +160,7 @@ class WP_REST_Posts_Controller extends WP_REST_Controller {
 
 		// Ensure an include parameter is set in case the orderby is set to 'include'.
 		if ( ! empty( $request['orderby'] ) && 'include' === $request['orderby'] && empty( $request['include'] ) ) {
-<<<<<<< HEAD
-			return new WP_Error( 'rest_orderby_include_missing_include', sprintf( __( 'Missing parameter(s): %s' ), 'include' ), array( 'status' => 400 ) );
-=======
 			return new WP_Error( 'rest_orderby_include_missing_include', __( 'You need to define an include parameter to order by include.' ), array( 'status' => 400 ) );
->>>>>>> 4.8
 		}
 
 		// Retrieve the list of registered collection query parameters.
@@ -2154,11 +2150,7 @@ class WP_REST_Posts_Controller extends WP_REST_Controller {
 
 		if ( $post_type->hierarchical || 'attachment' === $this->post_type ) {
 			$query_params['parent'] = array(
-<<<<<<< HEAD
-				'description'       => __( 'Limit result set to those of particular parent IDs.' ),
-=======
 				'description'       => __( 'Limit result set to items with particular parent IDs.' ),
->>>>>>> 4.8
 				'type'              => 'array',
 				'items'             => array(
 					'type'          => 'integer',

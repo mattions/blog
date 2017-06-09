@@ -351,22 +351,6 @@ echo esc_html( $title );
 ?></h1>
 
 <?php
-<<<<<<< HEAD
-	echo esc_html( $title );
-	if ( current_user_can( 'customize' ) ) {
-		printf(
-			' <a class="page-title-action hide-if-no-customize" href="%1$s">%2$s</a>',
-			esc_url( add_query_arg(
-				array(
-					array( 'autofocus' => array( 'panel' => 'widgets' ) ),
-					'return' => urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) )
-				),
-				admin_url( 'customize.php' )
-			) ),
-			__( 'Manage with Live Preview' )
-		);
-	}
-=======
 if ( current_user_can( 'customize' ) ) {
 	printf(
 		' <a class="page-title-action hide-if-no-customize" href="%1$s">%2$s</a>',
@@ -380,7 +364,6 @@ if ( current_user_can( 'customize' ) ) {
 		__( 'Manage with Live Preview' )
 	);
 }
->>>>>>> 4.8
 ?>
 
 <hr class="wp-header-end">

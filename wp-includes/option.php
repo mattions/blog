@@ -430,11 +430,7 @@ function add_option( $option, $value = '', $deprecated = '', $autoload = 'yes' )
 	$notoptions = wp_cache_get( 'notoptions', 'options' );
 	if ( !is_array( $notoptions ) || !isset( $notoptions[$option] ) )
 		/** This filter is documented in wp-includes/option.php */
-<<<<<<< HEAD
-		if ( apply_filters( 'default_option_' . $option, false, $option, false ) !== get_option( $option ) )
-=======
 		if ( apply_filters( "default_option_{$option}", false, $option, false ) !== get_option( $option ) )
->>>>>>> 4.8
 			return false;
 
 	$serialized_value = maybe_serialize( $value );

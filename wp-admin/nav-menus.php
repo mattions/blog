@@ -49,13 +49,9 @@ $num_locations = count( array_keys( $locations ) );
 // Allowed actions: add, update, delete
 $action = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : 'edit';
 
-/**
- * If a JSON blob of navigation menu data is in POST data, expand it and inject
- * it into `$_POST` to avoid PHP `max_input_vars` limitations. See #14134.
- *
- * @ignore
- * @since 4.5.3
- * @access private
+/*
+ * If a JSON blob of navigation menu data is found, expand it and inject it
+ * into `$_POST` to avoid PHP `max_input_vars` limitations. See #14134.
  */
 _wp_expand_nav_menu_post_data();
 
@@ -580,23 +576,6 @@ get_current_screen()->set_help_sidebar(
 require_once( ABSPATH . 'wp-admin/admin-header.php' );
 ?>
 <div class="wrap">
-<<<<<<< HEAD
-	<h1><?php echo esc_html( __( 'Menus' ) ); ?>
-		<?php
-		if ( current_user_can( 'customize' ) ) :
-			$focus = $locations_screen ? array( 'section' => 'menu_locations' ) : array( 'panel' => 'nav_menus' );
-			printf(
-				' <a class="page-title-action hide-if-no-customize" href="%1$s">%2$s</a>',
-				esc_url( add_query_arg( array(
-					array( 'autofocus' => $focus ),
-					'return' => urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) ),
-				), admin_url( 'customize.php' ) ) ),
-				__( 'Manage with Live Preview' )
-			);
-		endif;
-		?>
-	</h1>
-=======
 	<h1 class="wp-heading-inline"><?php echo esc_html( __( 'Menus' ) ); ?></h1>
 	<?php
 	if ( current_user_can( 'customize' ) ) :
@@ -614,7 +593,6 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
 	<hr class="wp-header-end">
 
->>>>>>> 4.8
 	<h2 class="nav-tab-wrapper wp-clearfix">
 		<a href="<?php echo admin_url( 'nav-menus.php' ); ?>" class="nav-tab<?php if ( ! isset( $_GET['action'] ) || isset( $_GET['action'] ) && 'locations' != $_GET['action'] ) echo ' nav-tab-active'; ?>"><?php esc_html_e( 'Edit Menus' ); ?></a>
 		<?php if ( $num_locations && $menu_count ) : ?>

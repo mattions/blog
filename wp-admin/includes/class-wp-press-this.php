@@ -1459,11 +1459,7 @@ class WP_Press_This {
 				<?php endif; ?>
 
 				<?php if ( $show_categories ) : ?>
-<<<<<<< HEAD
-					<button type="button" class="button-link post-option">
-=======
 					<button type="button" class="post-option">
->>>>>>> 4.8
 						<span class="dashicons dashicons-category"></span>
 						<span class="post-option-title"><?php _e( 'Categories' ); ?></span>
 						<span class="dashicons post-option-forward"></span>
@@ -1471,11 +1467,7 @@ class WP_Press_This {
 				<?php endif; ?>
 
 				<?php if ( $show_tags ) : ?>
-<<<<<<< HEAD
-					<button type="button" class="button-link post-option">
-=======
 					<button type="button" class="post-option">
->>>>>>> 4.8
 						<span class="dashicons dashicons-tag"></span>
 						<span class="post-option-title"><?php _e( 'Tags' ); ?></span>
 						<span class="dashicons post-option-forward"></span>
@@ -1496,11 +1488,7 @@ class WP_Press_This {
 
 			<?php if ( $show_categories ) : ?>
 				<div class="setting-modal is-off-screen is-hidden">
-<<<<<<< HEAD
-					<button type="button" class="button-link modal-close">
-=======
 					<button type="button" class="modal-close">
->>>>>>> 4.8
 						<span class="dashicons post-option-back"></span>
 						<span class="setting-title" aria-hidden="true"><?php _e( 'Categories' ); ?></span>
 						<span class="screen-reader-text"><?php _e( 'Back to post options' ) ?></span>
@@ -1511,11 +1499,7 @@ class WP_Press_This {
 
 			<?php if ( $show_tags ) : ?>
 				<div class="setting-modal tags is-off-screen is-hidden">
-<<<<<<< HEAD
-					<button type="button" class="button-link modal-close">
-=======
 					<button type="button" class="modal-close">
->>>>>>> 4.8
 						<span class="dashicons post-option-back"></span>
 						<span class="setting-title" aria-hidden="true"><?php _e( 'Tags' ); ?></span>
 						<span class="screen-reader-text"><?php _e( 'Back to post options' ) ?></span>

@@ -1,13 +1,8 @@
 === Twenty Thirteen ===
 Contributors: the WordPress team
 Requires at least: WordPress 3.6
-<<<<<<< HEAD
-Tested up to: WordPress 4.8-trunk
-Stable tag: 2.1
-=======
 Tested up to: WordPress 4.9-trunk
 Stable tag: 2.2
->>>>>>> 4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, two-columns, right-sidebar, custom-header, custom-menu, editor-style, featured-images, footer-widgets, microformats, post-formats, rtl-language-support, sticky-post, translation-ready, accessibility-ready
@@ -52,14 +47,11 @@ Source: http://www.genericons.com
 
 == Changelog ==
 
-<<<<<<< HEAD
-=======
 = 2.2 =
 * Released: June 8, 2017
 
 https://codex.wordpress.org/Twenty_Thirteen_Theme_Changelog#Version_2.2
 
->>>>>>> 4.8
 = 2.1 =
 * Released: December 6, 2016
 

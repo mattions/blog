@@ -345,11 +345,7 @@ window.wp = window.wp || {};
 				text = text.replace( /<\/figcaption>\s*/g, '</figcaption>' );
 			}
 
-<<<<<<< HEAD
-			// keep <br> tags inside captions and convert line breaks
-=======
 			// Keep <br> tags inside captions.
->>>>>>> 4.8
 			if ( text.indexOf( '[caption' ) !== -1 ) {
 				preserve_br = true;
 

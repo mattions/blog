@@ -799,20 +799,6 @@ li.assigned-to-menu-location .add-new-menu-item {
 	margin-bottom: 1em;
 }
 
-<<<<<<< HEAD
-.menu-delete {
-	color: #a00;
-	cursor: pointer;
-	text-decoration: underline;
-}
-
-.menu-delete:hover,
-.menu-delete:focus {
-	color: #f00;
-}
-
-=======
->>>>>>> 4.8
 .menu-item-handle {
 	margin-top: -1px;
 }

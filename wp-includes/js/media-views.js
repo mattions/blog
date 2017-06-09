@@ -3771,23 +3771,16 @@ AttachmentsBrowser = View.extend({
 
 		this.controller.on( 'toggle:upload:attachment', this.toggleUploader, this );
 		this.controller.on( 'edit:selection', this.editSelection );
-<<<<<<< HEAD
-		this.createToolbar();
-=======
 
->>>>>>> 4.8
 		// In the Media Library, the sidebar is used to display errors before the attachments grid.
 		if ( this.options.sidebar && 'errors' === this.options.sidebar ) {
 			this.createSidebar();
 		}
-<<<<<<< HEAD
-=======
 
 		/*
 		 * For accessibility reasons, place the Inline Uploader before other sections.
 		 * This way, in the Media Library, it's right after the Add New button, see ticket #37188.
 		 */
->>>>>>> 4.8
 		this.createUploader();
 
 		/*
@@ -3799,10 +3792,7 @@ AttachmentsBrowser = View.extend({
 
 		// Create the list of attachments.
 		this.createAttachments();
-<<<<<<< HEAD
-=======
 
->>>>>>> 4.8
 		// For accessibility reasons, place the normal sidebar after the attachments, see ticket #36909.
 		if ( this.options.sidebar && 'errors' !== this.options.sidebar ) {
 			this.createSidebar();
