@@ -91,6 +91,8 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
 
-/** Increasing memory allocated to the PHP **/
-define( 'WP_MEMORY_LIMIT', '256M' );
+/** Increasing memory allocated to the PHP and image size**/
+@ini_set( 'upload_max_size' , '100M' );
+@ini_set( 'post_max_size', '13M');
+@ini_set( 'memory_limit', '128M' );
 
