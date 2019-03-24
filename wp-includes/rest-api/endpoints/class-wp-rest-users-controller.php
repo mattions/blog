@@ -1418,6 +1418,14 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 			),
 		);
 
+		$query_params['who'] = array(
+			'description' => __( 'Limit result set to users who are considered authors.' ),
+			'type'        => 'string',
+			'enum'        => array(
+				'authors',
+			),
+		);
+
 		/**
 		 * Filter collection parameters for the users controller.
 		 *

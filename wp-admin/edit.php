@@ -205,6 +205,11 @@ if ( 'wp_block' === $post_type ) {
 	wp_enqueue_style( 'wp-list-reusable-blocks' );
 }
 
+if ( 'wp_block' === $post_type ) {
+	wp_enqueue_script( 'wp-list-reusable-blocks' );
+	wp_enqueue_style( 'wp-list-reusable-blocks' );
+}
+
 $title = $post_type_object->labels->name;
 
 if ( 'post' == $post_type ) {

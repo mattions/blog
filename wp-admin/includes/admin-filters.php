@@ -50,6 +50,11 @@ add_action( 'admin_menu', '_wp_privacy_hook_requests_page' );
 add_action( 'load-tools_page_export_personal_data', '_wp_privacy_requests_screen_options' );
 add_action( 'load-tools_page_remove_personal_data', '_wp_privacy_requests_screen_options' );
 
+// Privacy tools
+add_action( 'admin_menu', '_wp_privacy_hook_requests_page' );
+add_action( 'load-tools_page_export_personal_data', '_wp_privacy_requests_screen_options' );
+add_action( 'load-tools_page_remove_personal_data', '_wp_privacy_requests_screen_options' );
+
 // Prerendering.
 if ( ! is_customize_preview() ) {
 	add_filter( 'admin_print_styles', 'wp_resource_hints', 1 );
@@ -69,6 +74,9 @@ add_action( 'update_option_new_admin_email', 'update_option_new_admin_email', 10
 add_filter( 'heartbeat_received', 'wp_check_locked_posts', 10, 3 );
 add_filter( 'heartbeat_received', 'wp_refresh_post_lock', 10, 3 );
 add_filter( 'heartbeat_received', 'heartbeat_autosave', 500, 2 );
+
+add_filter( 'wp_refresh_nonces', 'wp_refresh_post_nonces', 10, 3 );
+add_filter( 'wp_refresh_nonces', 'wp_refresh_heartbeat_nonces' );
 
 add_filter( 'wp_refresh_nonces', 'wp_refresh_post_nonces', 10, 3 );
 add_filter( 'wp_refresh_nonces', 'wp_refresh_heartbeat_nonces' );

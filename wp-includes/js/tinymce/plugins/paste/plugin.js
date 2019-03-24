@@ -223,7 +223,21 @@ var paste = (function () {
           tag += ' ' + attrs.join(' ');
         }
       }
-      return tag + '>';
+      if (attrs.length) {
+        tag += ' ' + attrs.join(' ');
+      }
+    }
+    return tag + '>';
+  };
+  var toBlockElements = function (text, rootTag, rootAttrs) {
+    var blocks = text.split(/\n\n/);
+    var tagOpen = openContainer(rootTag, rootAttrs);
+    var tagClose = '</' + rootTag + '>';
+    var paragraphs = global$3.map(blocks, function (p) {
+      return p.split(/\n/).join('<br />');
+    });
+    var stitch = function (p) {
+      return tagOpen + p + tagClose;
     };
     var toBlockElements = function (text, rootTag, rootAttrs) {
       var blocks = text.split(/\n\n/);
@@ -297,6 +311,8 @@ var paste = (function () {
               walk(node);
             } while (node = node.next);
           }
+          convertParagraphToLi(node, 'ol', start);
+          continue;
         }
         if (blockElements[name$$1] && currentNode.next) {
           text += '\n';
@@ -304,6 +320,10 @@ var paste = (function () {
             text += '\n';
           }
         }
+        currentListNode = null;
+      } else {
+        prevListNode = currentListNode;
+        currentListNode = null;
       }
       html = filter(html, [/<!\[[^\]]+\]>/g]);
       walk(domParser.parse(html));
@@ -482,6 +502,10 @@ var paste = (function () {
           currentListNode = null;
         }
       }
+    });
+    if (/(bold)/i.test(outputStyles['font-weight'])) {
+      delete outputStyles['font-weight'];
+      node.wrap(new global$7('b', 1));
     }
     function filterStyles(editor, validStyles, node, styleValue) {
       var outputStyles = {}, matches;
@@ -647,6 +671,10 @@ var paste = (function () {
               name: name
             });
           }
+          node.attr({
+            href: href,
+            name: name
+          });
         }
       });
       var rootNode = domParser.parse(content);
@@ -1540,8 +1568,24 @@ var paste = (function () {
         } catch (e) {
           return false;
         }
+        pasteBin.remove();
+        pasteBin.create();
+        editor.once('keyup', removePasteBinOnKeyUp);
+        editor.once('paste', function () {
+          editor.off('keyup', removePasteBinOnKeyUp);
+        });
+      }
+    });
+    function insertClipboardContent(clipboardContent, isKeyBoardPaste, plainTextMode, internal) {
+      var content, isPlainTextHtml;
+      if (hasContentType(clipboardContent, 'text/html')) {
+        content = clipboardContent['text/html'];
       } else {
-        return false;
+        content = pasteBin.getHtml();
+        internal = internal ? internal : $_4x13hjirjjgwecu1.isMarked(content);
+        if (pasteBin.isDefaultContent(content)) {
+          plainTextMode = true;
+        }
       }
     };
     var setClipboardData = function (evt, data, fallback, done) {
@@ -1549,8 +1593,11 @@ var paste = (function () {
         evt.preventDefault();
         done();
       } else {
-        fallback(data.html, done);
+        pasteHtml$1(editor, content, internal);
       }
+    }
+    var getLastRng = function () {
+      return pasteBin.getLastRng() || editor.selection.getRng();
     };
     var fallback = function (editor) {
       return function (html, done) {
@@ -1579,6 +1626,15 @@ var paste = (function () {
           outer.parentNode.removeChild(outer);
           done();
         }, 0);
+      }
+    });
+  };
+  var registerEventsAndFilters = function (editor, pasteBin, pasteFormat) {
+    registerEventHandlers(editor, pasteBin, pasteFormat);
+    var src;
+    editor.parser.addNodeFilter('img', function (nodes, name$$1, args) {
+      var isPasteInsert = function (args) {
+        return args.data && args.data.paste === true;
       };
     };
     var getData = function (editor) {

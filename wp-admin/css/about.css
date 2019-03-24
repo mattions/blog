@@ -241,6 +241,23 @@
 	margin-top: 0;
 }
 
+.about-wrap .four-col .col {
+	align-self: flex-start;
+	min-width: 23%;
+	max-width: 23%;
+}
+
+.about-wrap .feature-section.eight-col .col {
+	align-self: flex-start;
+	margin-top: 6px;
+	min-width: 12%;
+	max-width: 12%;
+}
+
+.about-wrap .one-col img {
+	margin: 1em 0 2em;
+}
+
 .about-wrap .two-col img {
 	margin-bottom: 1.5em;
 }

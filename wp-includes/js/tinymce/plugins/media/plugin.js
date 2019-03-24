@@ -207,6 +207,12 @@ var media = (function () {
           });
           attrs.map[name] = value;
         }
+      } else if (value) {
+        attrs.push({
+          name: name,
+          value: value
+        });
+        attrs.map[name] = value;
       }
     };
     var normalizeHtml = function (html) {
@@ -524,7 +530,29 @@ var media = (function () {
         } else {
           handler({ url: data.source1 }, wrappedResolve, rej);
         }
+        return res({
+          url: data.source1,
+          html: response.html ? response.html : dataToHtml(data)
+        });
+      };
+      if (cache[data.source1]) {
+        wrappedResolve(cache[data.source1]);
+      } else {
+        handler({ url: data.source1 }, wrappedResolve, rej);
+      }
+    });
+  };
+  var defaultPromise = function (data, dataToHtml) {
+    return new global$5(function (res) {
+      res({
+        html: dataToHtml(data),
+        url: data.source1
       });
+    });
+  };
+  var loadedData = function (editor) {
+    return function (data) {
+      return $_bc7nlthbjjgwecoh.dataToHtml(editor, data);
     };
     var defaultPromise = function (data, dataToHtml) {
       return new global$5(function (res) {
@@ -555,12 +583,35 @@ var media = (function () {
       widthCtrl.state.set('oldVal', widthCtrl.value());
       heightCtrl.state.set('oldVal', heightCtrl.value());
     };
-    var doSizeControls = function (win, f) {
-      var widthCtrl = win.find('#width')[0];
-      var heightCtrl = win.find('#height')[0];
-      var constrained = win.find('#constrain')[0];
-      if (widthCtrl && heightCtrl && constrained) {
-        f(widthCtrl, heightCtrl, constrained.checked());
+  };
+  var getData = function (editor) {
+    var element = editor.selection.getNode();
+    var dataEmbed = element.getAttribute('data-ephox-embed-iri');
+    if (dataEmbed) {
+      return {
+        'source1': dataEmbed,
+        'data-ephox-embed-iri': dataEmbed,
+        'width': $_jbvx7h8jjgwecnx.getMaxWidth(element),
+        'height': $_jbvx7h8jjgwecnx.getMaxHeight(element)
+      };
+    }
+    return element.getAttribute('data-mce-object') ? $_6mep3hh4jjgwecnt.htmlToData($_69rpmgh3jjgwecnr.getScripts(editor), editor.serializer.serialize(element, { selection: true })) : {};
+  };
+  var getSource = function (editor) {
+    var elm = editor.selection.getNode();
+    if (elm.getAttribute('data-mce-object') || elm.getAttribute('data-ephox-embed-iri')) {
+      return editor.selection.getContent();
+    }
+  };
+  var addEmbedHtml = function (win, editor) {
+    return function (response) {
+      var html = response.html;
+      var embed = win.find('#embed')[0];
+      var data = global$2.extend($_6mep3hh4jjgwecnt.htmlToData($_69rpmgh3jjgwecnr.getScripts(editor), html), { source1: response.url });
+      win.fromJSON(data);
+      if (embed) {
+        embed.value(html);
+        $_ewaahuhhjjgwecow.updateSize(win);
       }
     };
     var doUpdateSize = function (widthCtrl, heightCtrl, isContrained) {
@@ -597,10 +648,11 @@ var media = (function () {
       };
       return {
         type: 'container',
-        label: 'Dimensions',
         layout: 'flex',
-        align: 'center',
-        spacing: 5,
+        direction: 'column',
+        align: 'stretch',
+        padding: 10,
+        spacing: 10,
         items: [
           {
             name: 'width',
@@ -1104,6 +1156,7 @@ var media = (function () {
           if (editor.dom.getAttrib(selectedNode, 'data-mce-selected')) {
             selectedNode.setAttribute('data-mce-selected', '2');
           }
+          node.replace(realElm);
         }
       });
       editor.on('ObjectSelected', function (e) {

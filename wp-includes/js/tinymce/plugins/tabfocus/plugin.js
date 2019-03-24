@@ -49,18 +49,11 @@ var tabfocus = (function () {
               x = i;
               return false;
             }
-          });
-          if (direction > 0) {
-            for (i = x + 1; i < el.length; i++) {
-              if (canSelect(el[i])) {
-                return el[i];
-              }
-            }
-          } else {
-            for (i = x - 1; i >= 0; i--) {
-              if (canSelect(el[i])) {
-                return el[i];
-              }
+          }
+        } else {
+          for (i = x - 1; i >= 0; i--) {
+            if (canSelect(el[i])) {
+              return el[i];
             }
           }
           return null;
@@ -106,7 +99,12 @@ var tabfocus = (function () {
         if (global$3.gecko) {
           editor.on('keypress keydown', tabHandler);
         } else {
-          editor.on('keydown', tabHandler);
+          global$4.setTimeout(function () {
+            if (!global$3.webkit) {
+              window.focus();
+            }
+            el.focus();
+          }, 10);
         }
       });
     };

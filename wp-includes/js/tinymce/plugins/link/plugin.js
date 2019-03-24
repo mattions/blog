@@ -183,7 +183,7 @@ var link = (function () {
             } else if (data.hasOwnProperty('text')) {
               editor.insertContent(editor.dom.createHTML('a', linkAttrs, editor.dom.encode(data.text)));
             } else {
-              editor.execCommand('mceInsertLink', false, linkAttrs);
+              anchorElm.textContent = data.text;
             }
           }
         });
@@ -196,10 +196,10 @@ var link = (function () {
           if (isImageFigure(node)) {
             unlinkImageFigure(editor, node);
           } else {
-            editor.execCommand('unlink');
+            editor.execCommand('mceInsertLink', false, linkAttrs);
           }
-        });
-      };
+        }
+      });
     };
     var unlinkImageFigure = function (editor, fig) {
       var a, img;
@@ -210,7 +210,7 @@ var link = (function () {
           a.parentNode.insertBefore(img, a);
           editor.dom.remove(a);
         }
-      }
+      });
     };
     var linkImageFigure = function (editor, fig, attrs) {
       var a, img;
@@ -245,6 +245,51 @@ var link = (function () {
           success: function (text) {
             callback(editor, JSON.parse(text));
           }
+        }
+        output.push(menuItem);
+      });
+      return output;
+    };
+    return appendItems(inputList, startItems || []);
+  };
+  var delayedConfirm = function (editor, message, callback) {
+    var rng = editor.selection.getRng();
+    global$5.setEditorTimeout(editor, function () {
+      editor.windowManager.confirm(message, function (state) {
+        editor.selection.setRng(rng);
+        callback(state);
+      });
+    });
+  };
+  var showDialog = function (editor, linkList) {
+    var data = {};
+    var selection = editor.selection;
+    var dom = editor.dom;
+    var anchorElm, initialText;
+    var win, onlyText, textListCtrl, linkListCtrl, relListCtrl, targetListCtrl, classListCtrl, linkTitleCtrl, value;
+    var linkListChangeHandler = function (e) {
+      var textCtrl = win.find('#text');
+      if (!textCtrl.value() || e.lastControl && textCtrl.value() === e.lastControl.text()) {
+        textCtrl.value(e.control.text());
+      }
+      win.find('#href').value(e.control.value());
+    };
+    var buildAnchorListControl = function (url) {
+      var anchorList = [];
+      global$4.each(editor.dom.select('a:not([href])'), function (anchor) {
+        var id = anchor.name || anchor.id;
+        if (id) {
+          anchorList.push({
+            text: id,
+            value: '#' + id,
+            selected: url.indexOf('#' + id) !== -1
+          });
+        }
+      });
+      if (anchorList.length) {
+        anchorList.unshift({
+          text: 'None',
+          value: ''
         });
       } else if (typeof linkList === 'function') {
         linkList(function (list) {
@@ -281,6 +326,15 @@ var link = (function () {
           callback(state);
         });
       });
+      if (meta.attach) {
+        attachState = {
+          href: this.value(),
+          attach: meta.attach
+        };
+      }
+      if (!meta.text) {
+        updateText.call(this);
+      }
     };
     var showDialog = function (editor, linkList) {
       var data = {};
@@ -551,6 +605,7 @@ var link = (function () {
           OpenUrl.open(a.href);
         }
       }
+      return false;
     };
     var openDialog = function (editor) {
       return function () {
@@ -660,6 +715,10 @@ var link = (function () {
           onclick: Actions.gotoSelectedLink(editor)
         });
       }
+      editor.on('nodechange', toggleVisibility);
+      self.on('remove', function () {
+        editor.off('nodechange', toggleVisibility);
+      });
     };
     var setupMenuItems = function (editor) {
       editor.addMenuItem('openlink', {

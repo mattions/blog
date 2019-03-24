@@ -1675,6 +1675,7 @@ var lists = (function () {
             block = null;
             return;
           }
+          node = node.nextSibling;
         }
         if (!block) {
           block = dom.create('p');
@@ -1774,7 +1775,8 @@ var lists = (function () {
         var newList = dom.rename(list, listName);
         updateListWithDetails(dom, newList, detail);
       } else {
-        updateListWithDetails(dom, list, detail);
+        ulParent.insertBefore($_kbc02gqjjgwecl9.createNewTextBlock(editor, li), ul);
+        DOM$4.remove(li);
       }
     };
     var toggleMultipleLists = function (editor, parentList, lists, listName, detail) {
@@ -1804,8 +1806,6 @@ var lists = (function () {
           mergeWithAdjacentLists(editor.dom, editor.dom.rename(parentList, listName));
           editor.selection.setRng(Bookmark.resolveBookmark(bookmark));
         }
-      } else {
-        applyList(editor, listName, detail);
       }
     };
     var toggleList = function (editor, listName, detail) {
@@ -2019,8 +2019,10 @@ var lists = (function () {
       var startListParent = editor.dom.getParent(selectionStartElm, 'LI,DT,DD', root);
       if (startListParent || Selection.getSelectedListItems(editor).length > 0) {
         editor.undoManager.transact(function () {
-          editor.execCommand('Delete');
-          NormalizeLists.normalizeLists(editor.dom, editor.getBody());
+          removeBlock(dom, block, root);
+          $_aek3i3gejjgwecki.mergeWithAdjacentLists(dom, otherLi_1.parentNode);
+          editor.selection.select(otherLi_1, true);
+          editor.selection.collapse(isForward);
         });
         return true;
       }

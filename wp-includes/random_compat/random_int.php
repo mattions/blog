@@ -188,3 +188,4 @@ if (!is_callable('random_int')) {
         return (int) $val;
     }
 }
+endif;

@@ -155,7 +155,6 @@ var image = (function () {
       if (value.length > 0 && /^[0-9]+$/.test(value)) {
         value += 'px';
       }
-      return value;
     };
     var mergeMargins = function (css) {
       if (css.margin) {

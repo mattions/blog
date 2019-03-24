@@ -439,6 +439,30 @@ var modern = (function () {
       }, function (cls, pos) {
         panel.classes.toggle('arrow-' + cls, predicate(pos, relPos.substr(1, 1)));
       });
+      editor.contextToolbars = {};
+    });
+    editor.shortcuts.add('ctrl+shift+e > ctrl+shift+p', '', function () {
+      var match = findFrontMostMatch(editor.selection.getNode());
+      if (match && match.toolbar.panel) {
+        match.toolbar.panel.items()[0].focus();
+      }
+    });
+  };
+  var $_g1gegqu1jjgwefne = { addContextualToolbars: addContextualToolbars };
+
+  var typeOf = function (x) {
+    if (x === null)
+      return 'null';
+    var t = typeof x;
+    if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      return 'array';
+    if (t === 'object' && String.prototype.isPrototypeOf(x))
+      return 'string';
+    return t;
+  };
+  var isType = function (type) {
+    return function (value) {
+      return typeOf(value) === type;
     };
     var userConstrain = function (handler, x, y, elementRect, contentAreaRect, panelRect) {
       panelRect = toClientRect({
@@ -903,6 +927,7 @@ var modern = (function () {
         if (menu) {
           menuButtons.push(menu);
         }
+        btnCtrl.active(true);
       }
       return menuButtons;
     };
@@ -911,8 +936,11 @@ var modern = (function () {
     var DOM$1 = global$3.DOM;
     var getSize = function (elm) {
       return {
-        width: elm.clientWidth,
-        height: elm.clientHeight
+        type: 'button',
+        icon: settings.icon,
+        image: settings.image,
+        tooltip: settings.tooltip,
+        onclick: showPanel(editor, sidebar.name, editor.sidebars)
       };
     };
     var resizeTo = function (editor, width, height) {
@@ -1181,8 +1209,10 @@ var modern = (function () {
       A11y.addKeys(editor, panel);
       ContextToolbars.addContextualToolbars(editor);
       return {
-        iframeContainer: panel.find('#iframe')[0].getEl(),
-        editorContainer: panel.getEl()
+        top: getSide(prefix + 'TopWidth'),
+        right: getSide(prefix + 'RightWidth'),
+        bottom: getSide(prefix + 'BottomWidth'),
+        left: getSide(prefix + 'LeftWidth')
       };
     };
     var Iframe = { render: render };

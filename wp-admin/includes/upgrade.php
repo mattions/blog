@@ -815,6 +815,9 @@ function upgrade_all() {
 		upgrade_510();
 	}
 
+	if ( $wp_current_db_version < 43764 )
+		upgrade_500();
+
 	maybe_disable_link_manager();
 
 	maybe_disable_automattic_widgets();

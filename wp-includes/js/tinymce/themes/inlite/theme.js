@@ -7191,6 +7191,16 @@ var inlite = (function () {
     var descendant$1 = function (scope, selector) {
       return one(selector, scope);
     };
+    return me;
+  };
+  var from = function (value) {
+    return value === null || value === undefined ? NONE : some(value);
+  };
+  var Option = {
+    some: some,
+    none: none,
+    from: from
+  };
 
     var toggleFormat = function (editor, fmt) {
       return function () {
@@ -8856,6 +8866,7 @@ var inlite = (function () {
           return exists(values, function (a) {
             return a.menu ? valueExists(a.menu) : a.value === value;
           });
+          self.fire('submit', { data: rootControl.toJSON() });
         }
         if (this.settings.values) {
           if (valueExists(this.settings.values)) {
