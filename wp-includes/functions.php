@@ -7431,30 +7431,3 @@ function wp_get_direct_php_update_url() {
 
 	return $direct_update_url;
 }
-
-/**
- * Display a button directly linking to a PHP update process.
- *
- * This provides hosts with a way for users to be sent directly to their PHP update process.
- *
- * The button is only displayed if a URL is returned by `wp_get_direct_php_update_url()`.
- *
- * @since 5.1.1
- */
-function wp_direct_php_update_button() {
-	$direct_update_url = wp_get_direct_php_update_url();
-
-	if ( empty( $direct_update_url ) ) {
-		return;
-	}
-
-	echo '<p class="button-container">';
-	printf(
-		'<a class="button button-primary" href="%1$s" target="_blank" rel="noopener noreferrer">%2$s <span class="screen-reader-text">%3$s</span><span aria-hidden="true" class="dashicons dashicons-external"></span></a>',
-		esc_url( $direct_update_url ),
-		__( 'Update PHP' ),
-		/* translators: accessibility text */
-		__( '(opens in a new tab)' )
-	);
-	echo '</p>';
-}
