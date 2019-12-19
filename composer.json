@@ -1,0 +1,13 @@
+{
+
+    "require": {
+        "php": "~7.2.0",
+        "ext-mbstring" : "*"
+    },
+
+    "scripts": {
+        "post-install-cmd": [
+            "chmod -R 777 wp-content"
+        ]
+    }
+}
