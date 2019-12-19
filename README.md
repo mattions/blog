@@ -11,3 +11,12 @@
 To deploy
 
 	./deploy.sh
+	
+# Update the PHP version
+
+Change the `composer.json` to the desired runtime
+and then remember to run
+
+    composer update
+    
+
