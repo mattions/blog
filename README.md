@@ -5,6 +5,12 @@
 	git fetch --tags wordpress
 	git checkout production2
 	git merge $TAG
+	
+	# Note: if the merge does not appear to be a fast forward,
+	# we need to force the merge with the upstream tree.
+	
+	# To do this, use theirs and be happy with.
+	git merge -X theirs $TAG
 
 #Deploy
 
