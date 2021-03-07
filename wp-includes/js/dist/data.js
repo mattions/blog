@@ -82,7 +82,7 @@ this["wp"] = this["wp"] || {}; this["wp"]["data"] =
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 475);
+/******/ 	return __webpack_require__(__webpack_require__.s = 474);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -716,7 +716,7 @@ if (typeof self !== 'undefined') {
 var result = Object(_ponyfill_js__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"])(root);
 /* harmony default export */ __webpack_exports__["a"] = (result);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(121), __webpack_require__(444)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(121), __webpack_require__(443)(module)))
 
 /***/ }),
 
@@ -828,7 +828,7 @@ function _nonIterableRest() {
 
 /***/ }),
 
-/***/ 444:
+/***/ 443:
 /***/ (function(module, exports) {
 
 module.exports = function(originalModule) {
@@ -902,7 +902,7 @@ function _asyncToGenerator(fn) {
 
 /***/ }),
 
-/***/ 475:
+/***/ 474:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

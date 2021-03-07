@@ -82,7 +82,7 @@ this["wp"] = this["wp"] || {}; this["wp"]["blockLibrary"] =
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 468);
+/******/ 	return __webpack_require__(__webpack_require__.s = 467);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -2221,7 +2221,7 @@ function _asyncToGenerator(fn) {
 
 /***/ }),
 
-/***/ 468:
+/***/ 467:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3583,7 +3583,9 @@ var util_metadata = {
     align: true,
     reusable: false,
     html: false
-  }
+  },
+  editorStyle: "wp-block-embed-editor",
+  style: "wp-block-embed"
 };
 var DEFAULT_EMBED_BLOCK = util_metadata.name;
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
@@ -15077,7 +15079,9 @@ var transforms_metadata = {
     align: true,
     reusable: false,
     html: false
-  }
+  },
+  editorStyle: "wp-block-embed-editor",
+  style: "wp-block-embed"
 };
 var EMBED_BLOCK = transforms_metadata.name;
 /**
@@ -15666,7 +15670,9 @@ var deprecated_metadata = {
     align: true,
     reusable: false,
     html: false
-  }
+  },
+  editorStyle: "wp-block-embed-editor",
+  style: "wp-block-embed"
 };
 /**
  * WordPress dependencies
@@ -15744,7 +15750,9 @@ var embed_metadata = {
     align: true,
     reusable: false,
     html: false
-  }
+  },
+  editorStyle: "wp-block-embed-editor",
+  style: "wp-block-embed"
 };
 
 
@@ -16353,7 +16361,9 @@ function HTMLEdit(_ref) {
     setIsPreview(false);
   }
 
-  return Object(external_this_wp_element_["createElement"])("div", Object(external_this_wp_blockEditor_["useBlockProps"])(), Object(external_this_wp_element_["createElement"])(external_this_wp_blockEditor_["BlockControls"], null, Object(external_this_wp_element_["createElement"])(external_this_wp_components_["ToolbarGroup"], null, Object(external_this_wp_element_["createElement"])(external_this_wp_components_["ToolbarButton"], {
+  return Object(external_this_wp_element_["createElement"])("div", Object(external_this_wp_blockEditor_["useBlockProps"])({
+    className: 'block-library-html__edit'
+  }), Object(external_this_wp_element_["createElement"])(external_this_wp_blockEditor_["BlockControls"], null, Object(external_this_wp_element_["createElement"])(external_this_wp_components_["ToolbarGroup"], null, Object(external_this_wp_element_["createElement"])(external_this_wp_components_["ToolbarButton"], {
     className: "components-tab-button",
     isPressed: !isPreview,
     onClick: switchToHTML
