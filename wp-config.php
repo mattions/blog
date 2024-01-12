@@ -44,14 +44,14 @@ $_SERVER['SERVER_PORT'] = 443;
 *
 * @since 2.6.0
 */
-define('AUTH_KEY', getenv('AUTH_KEY'));
-define('SECURE_AUTH_KEY', getenv('SECURE_AUTH_KEY'));
-define('LOGGED_IN_KEY', getenv('LOGGED_IN_KEY'));
-define('NONCE_KEY', getenv('NONCE_KEY'));
-define('AUTH_SALT', getenv('AUTH_SALT'));
-define('SECURE_AUTH_SALT', getenv('SECURE_AUTH_SALT'));
-define('LOGGED_IN_SALT', getenv('LOGGED_IN_SALT'));
-define('NONCE_SALT', getenv('NONCE_SALT'));
+define('AUTH_KEY',         'HYV@B0^Q+en:hN:v3^3G0j49S|EUveC:||BYTXvy),9`+}ds;fKZchB--&0,:jnF');
+define('SECURE_AUTH_KEY',  't/E*f Fv^hrAlTiJk6:b+19!n)ck;Fr]2,!Wdu]}~):,v2F_{TrAp@qI3yl4|$J?');
+define('LOGGED_IN_KEY',    '9G]%o_Iih+VHNpDMn#RBuFIxrX._+{%7foi[(]+}EGc?=y+^@%Ls+6U}tj1M|#<6');
+define('NONCE_KEY',        '_2R<` ^>Li.8+{ia_aL8>Tj~mB3l{]i6(r|$O4># h8Zi|DYgP!#8@HNi)W4G:Q|');
+define('AUTH_SALT',        '8MWVGgZRv=u|h^EK-B7@3gM.d&uq5dmfQ=xY!+#76oXrY !n Fu@wt/}!c 5)$Df');
+define('SECURE_AUTH_SALT', 'i@`J5)D+XxYUVN1.-+x_c1Fy`Bj|3yCudcX*n,A|. 5o2Vti$3TH^,Rmbjw_k*)V');
+define('LOGGED_IN_SALT',   'L) Z*Us-FoALgB$)[>sE|MdE@HZqli+$(jZj}-8KcWDoyJev#[O7vv>(Dku*~S=<');
+define('NONCE_SALT',       '}F+Tmyb?re-+G?]M]{k+9|IzC.J/?t&8:Qdg>*z*2.48Q(q.Rz44+|)P1EGJ/-JH');
 
 /**#@-*/
 
