@@ -20,17 +20,26 @@
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', getenv('DB_NAME'));
+
+$url = parse_url(getenv("DATABASE_URL"));
+
+$host = $url["host"];
+$username = $url["user"];
+$password = $url["pass"];
+$database = substr($url["path"], 1);
+
+/** The name of the database for WordPress */
+define( 'DB_NAME', $database );
+
 /** MySQL database username */
-define('DB_USER', getenv('DB_USER'));
+define( 'DB_USER', $username );
+
 /** MySQL database password */
-define('DB_PASSWORD',getenv('DB_PASSWORD'));
+define( 'DB_PASSWORD', $password );
+
 /** MySQL hostname */
-define('DB_HOST', getenv('DB_HOST') . ":" . getenv('DB_PORT'));
-/** Database Charset to use in creating database tables. */
-define('DB_CHARSET', 'utf8');
-/** The Database Collate type. Don't change this if in doubt. */
-define('DB_COLLATE', '');
+define( 'DB_HOST', $host );
+
 
 /** Server settings for Jetpack */
 $_SERVER['SERVER_PORT'] = 443;
