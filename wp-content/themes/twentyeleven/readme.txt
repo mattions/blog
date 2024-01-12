@@ -1,8 +1,9 @@
 === Twenty Eleven ===
 Contributors: wordpressdotorg
-Requires at least: WordPress 3.2
-Tested up to: 5.8
-Stable tag: 3.8
+Requires at least: 3.2
+Tested up to: 6.4
+Requires PHP: 5.2.4
+Stable tag: 4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, two-columns, left-sidebar, right-sidebar, custom-background, custom-colors, custom-header, custom-menu, editor-style, featured-image-header, featured-images, flexible-header, footer-widgets, full-width-template, microformats, post-formats, rtl-language-support, sticky-post, theme-options, translation-ready, block-patterns
@@ -22,7 +23,7 @@ For more information about Twenty Eleven please go to https://codex.wordpress.or
 
 == Copyright ==
 
-Twenty Eleven WordPress Theme, Copyright 2011-2021 WordPress.org & Automattic.com
+Twenty Eleven WordPress Theme, Copyright 2011-2023 WordPress.org & Automattic.com
 Twenty Eleven is Distributed under the terms of the GNU GPL
 
 This program is free software: you can redistribute it and/or modify
@@ -46,6 +47,41 @@ Images
 "People Woman Photo" by Brooke Cagle. CC0. https://stocksnap.io/photo/people-woman-MU7G67710S
 
 == Changelog ==
+
+= 4.5 =
+* Released: November 7, 2023
+
+https://codex.wordpress.org/Twenty_Eleven_Theme_Changelog#Version_4.5
+
+= 4.4 =
+* Released: August 8, 2023
+
+https://codex.wordpress.org/Twenty_Eleven_Theme_Changelog#Version_4.4
+
+= 4.3 =
+* Released: March 28, 2023
+
+https://codex.wordpress.org/Twenty_Eleven_Theme_Changelog#Version_4.3
+
+= 4.2 =
+* Released: November 1, 2022
+
+https://codex.wordpress.org/Twenty_Eleven_Theme_Changelog#Version_4.2
+
+= 4.1 =
+* Released: May 24, 2022
+
+https://codex.wordpress.org/Twenty_Eleven_Theme_Changelog#Version_4.1
+
+= 4.0 =
+* Released: January 25, 2022
+
+https://codex.wordpress.org/Twenty_Eleven_Theme_Changelog#Version_4.0
+
+= 3.9 =
+* Released: July 26, 2021
+
+https://codex.wordpress.org/Twenty_Eleven_Theme_Changelog#Version_3.9
 
 = 3.8 =
 * Released: July 20, 2021
